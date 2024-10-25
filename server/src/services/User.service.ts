@@ -1,11 +1,17 @@
-import { User } from "../models";
- 
+import { UserRepository } from "../repositories/User.repository";
+
 export class UserService {
+
+    private userRepository: UserRepository;
+
+    constructor() {
+        this.userRepository = new UserRepository();
+    }
     async getAllUsers() {
-        return await User.findAll();
+        return await this.userRepository.getAllUsers();
     }
 
     async getUserById(id: string) {
-        return await User.findByPk(id);
+        return await this.userRepository.getUserById(id);
     }
 }

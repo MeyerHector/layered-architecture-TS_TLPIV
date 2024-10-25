@@ -1,19 +1,17 @@
 import { CreateTask } from "../interfaces";
-import { Task } from "../models";
-import { User } from "../models";
- 
+import { TaskRepository } from '../repositories/Task.repository';
+
 export class TaskService {
+    private taskRepository: TaskRepository;
+
+    constructor() {
+        this.taskRepository = new TaskRepository();
+    }
 
     public async createTask(taskData: CreateTask) {
-        const {title, description, date} = taskData;
+        const { title, description, date, userId } = taskData;
         try {
-            const task = await Task.create({
-                title,
-                description,
-                date,
-                userId: taskData.userId
-            });
-
+            const task = await this.taskRepository.createTask(title, description, date, userId);
             return task;
         } catch (error: any) {
             throw new Error(error.message);
@@ -21,10 +19,10 @@ export class TaskService {
     }
 
     public async getTasksByUser(userId: string) {
-        return await Task.findAll({where: {userId}, include: [User]});
+        return await this.taskRepository.getTasksByUser(userId);
     }
 
     public async getTaskById(taskId: string) {
-        return await Task.findByPk(taskId, {include: [User]});
+        return await this.taskRepository.getTaskById(taskId);
     }
 }
