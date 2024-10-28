@@ -17,29 +17,48 @@ export const AuthProvider = ({ children }) => {
   const [errors, setErrors] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const singup = async (user) => {
+  const signup = async (user) => {
     try {
       const res = await registerRequest(user);
-      console.log(res.data);
-      setUser(res.data);
-      setIsAuthenticated(true);
+      console.log("Respuesta completa de signup:", res);
+      console.log("Datos de usuario:", res.data.user);
+      console.log("Token en signup:", res.data.token);
+
+      const token = res.data.token;
+      if (token) {
+        setUser(res.data.user);
+        setIsAuthenticated(true);
+        Cookies.set("token", token);
+      } else {
+        console.error("Token no encontrado en la respuesta de registro");
+      }
     } catch (error) {
-      console.log(error.response);
-      setErrors(error.response.data);
+      console.log("Error en signup:", error.response);
+      setErrors(error.response?.data || ["Error en el registro"]);
     }
   };
 
-  const singin = async (user) => {
+  const signin = async (user) => {
     try {
       const res = await loginRequest(user);
-      console.log(res);
-      setUser(res.data);
-      setIsAuthenticated(true);
-    } catch (error) {
-      if (Array.isArray(error.response.data)) {
-        return setErrors(error.response.data);
+      console.log("Respuesta completa:", res);
+      console.log("Datos de la respuesta:", res.data);
+      console.log("Token:", res.data.user.token);
+
+      if (res.data && res.data.user && res.data.user.token) {
+        setUser(res.data.user);
+        setIsAuthenticated(true);
+        Cookies.set("token", res.data.user.token);
+      } else {
+        console.error("Token no encontrado en la respuesta");
       }
-      setErrors([error.response.data.message]);
+    } catch (error) {
+      console.log(error.response);
+      setErrors(
+        Array.isArray(error.response?.data)
+          ? error.response.data
+          : [error.response?.data.message]
+      );
     }
   };
 
@@ -61,7 +80,6 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     async function checkLogin() {
       const cookies = Cookies.get();
-
       if (!cookies.token) {
         setIsAuthenticated(false);
         setLoading(false);
@@ -75,14 +93,13 @@ export const AuthProvider = ({ children }) => {
           setLoading(false);
           return;
         }
-
         setIsAuthenticated(true);
         setUser(res.data);
-        setLoading(false);
       } catch (error) {
         console.log(error);
         setIsAuthenticated(false);
         setUser(null);
+      } finally {
         setLoading(false);
       }
     }
@@ -92,7 +109,7 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider
-      value={{ singup, singin, logout, loading, user, isAuthenticated, errors }}
+      value={{ signup, signin, logout, loading, user, isAuthenticated, errors }}
     >
       {children}
     </AuthContext.Provider>

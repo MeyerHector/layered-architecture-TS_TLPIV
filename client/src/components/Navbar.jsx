@@ -9,13 +9,13 @@ function Navbar() {
       <Link to={
         isAuthenticated ? "/tasks" : "/"
       }>
-        <h1 className="text-2xl font-bold">Tasks Manager</h1>
+        <h1 className="text-2xl font-bold">Gestor de Tareas</h1>
       </Link>
       {isAuthenticated ? (
         <>
           <ul className="flex gap-x-2 ">
             <li>
-              <h1>Welcome, {user.username} ! </h1>
+              <h1>Bienvenido, {user.name} ! </h1>
             </li>
             <li>
               <Link
@@ -23,7 +23,7 @@ function Navbar() {
                 className="bg-indigo-500 px-4 py-1 rounded-sm"
               >
                 {" "}
-                Add a new task
+                Agrega una Tarea
               </Link>
             </li>
             <li>
@@ -34,7 +34,7 @@ function Navbar() {
                 }}
               >
                 {" "}
-                Logout{" "}
+                Cerrar Sesión{" "}
               </Link>
             </li>
           </ul>

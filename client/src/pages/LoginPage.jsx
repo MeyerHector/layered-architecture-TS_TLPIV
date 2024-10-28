@@ -10,11 +10,11 @@ function LoginPage() {
     formState: { errors },
   } = useForm();
 
-  const { singin, errors: signinErrors, isAuthenticated } = useAuth();
+  const { signin, errors: signinErrors, isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
   const onSubmit = handleSubmit((data) => {
-    singin(data);
+    signin(data);
   });
 
   useEffect(() => {
