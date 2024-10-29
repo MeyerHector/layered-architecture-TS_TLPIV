@@ -16,27 +16,28 @@ function TaskFormPage() {
   useEffect(() => {
     async function loadTask() {
       if (params.id) {
-        const task = await getTaskById(params.id);
-        console.log(task);
-        setValue("title", task.title);
-        setValue("description", task.description);
-        setValue("date", dayjs(task.date).utc().format());
+        const tasks = await getTaskById(params.id);
+        console.log(tasks);
+        setValue("title", tasks.title);
+        setValue("description", tasks.description);
+        setValue("date", dayjs(tasks.date).utc().format());
       }
     }
     loadTask();
   }, []);
 
-  const onSubmit = handleSubmit((data) => {
+  const onSubmit = handleSubmit(async (data) => {
     const dataValid = {
       ...data,
       date: data.date ? dayjs.utc(data.date).format() : dayjs.utc().format(),
     };
 
     if (params.id) {
-      updateTask(params.id, dataValid);
+      await updateTask(params.id, dataValid);
     } else {
-      addTask(dataValid);
+      await addTask(dataValid);
     }
+
     navigate("/tasks");
   });
 

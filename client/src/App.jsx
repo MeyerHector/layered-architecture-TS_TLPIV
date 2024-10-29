@@ -10,14 +10,14 @@ import HomePage from "./pages/HomePage";
 
 import ProtectedRoute from "./ProtectedRoute";
 import { TaskProvider } from "./context/TaskContext";
-import Navbar from "./components/NavBar";
+import Navbar from "./components/Navbar";
 
 function App() {
   return (
     <AuthProvider>
       <TaskProvider>
         <BrowserRouter>
-          <main className="conteiner mx-auto px-10">
+          <main className="container mx-auto px-10">
             <Navbar />
             <Routes>
               <Route path="/" element={<HomePage />} />

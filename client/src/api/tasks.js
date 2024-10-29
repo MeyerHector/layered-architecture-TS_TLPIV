@@ -1,11 +1,42 @@
 import axios from "./axios";
 
-export const getTasksRequest = () => axios.get("/tasks");
+const getAuthToken = () => {
+  return localStorage.getItem("token");
+};
 
-export const getTaskByIdRequest = (id) => axios.get(`/tasks/${id}`);
+axios.interceptors.request.use(
+  (config) => {
+    const token = getAuthToken();
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
 
-export const addTaskRequest = (task) => axios.post("/tasks", task);
+export const getTasksRequest = () =>
+  axios.get("api/tasks", {
+    headers: { Authorization: `Bearer ${getAuthToken()}` },
+  });
 
-export const updateTaskRequest = (id, task) => axios.put(`/tasks/${id}`, task);
+export const getTaskByIdRequest = (id) =>
+  axios.get(`api/tasks/${id}`, {
+    headers: { Authorization: `Bearer ${getAuthToken()}` },
+  });
 
-export const deleteTaskRequest = (id) => axios.delete(`/tasks/${id}`);
+export const addTaskRequest = (task) =>
+  axios.post("api/tasks", task, {
+    headers: { Authorization: `Bearer ${getAuthToken()}` },
+  });
+export const updateTaskRequest = (id, task) =>
+  axios.put(`api/tasks/${id}`, task, {
+    headers: { Authorization: `Bearer ${getAuthToken()}` },
+  });
+
+export const deleteTaskRequest = (id) =>
+  axios.delete(`api/tasks/${id}`, {
+    headers: { Authorization: `Bearer ${getAuthToken()}` },
+  });

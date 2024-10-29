@@ -1,51 +1,54 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useCallback } from "react";
 import {
   addTaskRequest,
   getTasksRequest,
   deleteTaskRequest,
   getTaskByIdRequest,
-  updateTaskRequest
+  updateTaskRequest,
 } from "../api/tasks";
 
 const TaskContext = createContext();
 
 export const useTasks = () => {
   const context = useContext(TaskContext);
-
   if (!context) {
-    throw new Error("useTask debe estar dentro del proveedor TaskContext");
+    throw new Error("useTasks debe estar dentro del proveedor TaskContext");
   }
-
   return context;
 };
 
 export function TaskProvider({ children }) {
   const [tasks, setTasks] = useState([]);
 
-  const getTasks = async () => {
+  const getTasks = useCallback(async () => {
     try {
       const res = await getTasksRequest();
       setTasks(res.data);
     } catch (error) {
       console.error(error);
     }
-  };
+  }, []); 
 
   const addTask = async (task) => {
     try {
       const res = await addTaskRequest(task);
       console.log(res);
+      setTasks((prevTasks) => [...prevTasks, res.data]);
     } catch (error) {
       console.log(error);
     }
   };
 
   const deleteTask = async (id) => {
+    console.log(`Intentando eliminar tarea con ID: ${id}`);
     try {
       const res = await deleteTaskRequest(id);
-      if (res.status === 204) setTasks(tasks.filter((task) => task._id !== id));
+      if (res.status === 204) {
+        console.log(`Tarea con ID: ${id} eliminada.`);
+        setTasks((prevTasks) => prevTasks.filter((task) => task._id !== id));
+      }
     } catch (error) {
-      console.log(error);
+      console.log(`Error al eliminar tarea con ID: ${id}`, error);
     }
   };
 
@@ -58,14 +61,17 @@ export function TaskProvider({ children }) {
     }
   };
 
-const updateTask = async (id, task) => {
-  try {
-    const res = await updateTaskRequest(id, task);
-    console.log(res)
-  } catch (error) {
-    console.log(error)
-  }
-}
+  const updateTask = async (id, task) => {
+    try {
+      const res = await updateTaskRequest(id, task);
+      console.log(res);
+      setTasks((prevTasks) =>
+        prevTasks.map((t) => (t._id === id ? res.data : t))
+      );
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <TaskContext.Provider
@@ -75,7 +81,7 @@ const updateTask = async (id, task) => {
         getTasks,
         getTaskById,
         deleteTask,
-        updateTask
+        updateTask,
       }}
     >
       {children}

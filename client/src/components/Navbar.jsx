@@ -6,49 +6,38 @@ function Navbar() {
 
   return (
     <nav className="bg-zinc-700 my-3 flex justify-between py-5 px-10 rounded-lg">
-      <Link to={
-        isAuthenticated ? "/tasks" : "/"
-      }>
+      <Link to={isAuthenticated ? "/tasks" : "/"}>
         <h1 className="text-2xl font-bold">Gestor de Tareas</h1>
       </Link>
       {isAuthenticated ? (
         <>
-          <ul className="flex gap-x-2 ">
+          <ul className="flex gap-x-2">
             <li>
-              <h1>Bienvenido, {user.name} ! </h1>
+              <h1 className="text-white">
+                Bienvenido, {user?.name || "Usuario"}!
+              </h1>
             </li>
             <li>
               <Link
                 to="/add-task"
                 className="bg-indigo-500 px-4 py-1 rounded-sm"
               >
-                {" "}
                 Agrega una Tarea
               </Link>
             </li>
             <li>
-              <Link
-                to="/"
-                onClick={() => {
-                  logout();
-                }}
-              >
-                {" "}
-                Cerrar Sesión{" "}
+              <Link to="/" onClick={logout}>
+                Cerrar Sesión
               </Link>
             </li>
           </ul>
         </>
       ) : (
         <>
-          <ul className="flex gap-x-2 ">
+          <ul className="flex gap-x-2">
             <li>
-              <Link
-                to="/login"
-                className="bg-indigo-500     px-4 py-1 rounded-sm"
-              >
-                {" "}
-                Login{" "}
+              <Link to="/login" className="bg-indigo-500 px-4 py-1 rounded-sm">
+                Login
               </Link>
             </li>
             <li>
@@ -56,8 +45,7 @@ function Navbar() {
                 to="/register"
                 className="bg-indigo-500 px-4 py-1 rounded-sm"
               >
-                {" "}
-                Register{" "}
+                Register
               </Link>
             </li>
           </ul>
