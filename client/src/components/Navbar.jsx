@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 function Navbar() {
-  const { isAuthenticated, logout, user } = useAuth();
+  const { isAuthenticated, logout } = useAuth();
 
   return (
     <nav className="bg-zinc-700 my-3 flex justify-between py-5 px-10 rounded-lg">
@@ -13,9 +13,7 @@ function Navbar() {
         <>
           <ul className="flex gap-x-2">
             <li>
-              <h1 className="text-white">
-                Bienvenido, {user?.name || "Usuario"}!
-              </h1>
+              <h1 className="text-white">Bienvenido!</h1>
             </li>
             <li>
               <Link

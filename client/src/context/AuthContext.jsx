@@ -16,13 +16,15 @@ export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [errors, setErrors] = useState([]);
   const [loading, setLoading] = useState(true);
-
+  const initialState = {
+    token: token ? token : null,
+    isLogged: false,
+  };
   const signup = async (user) => {
     try {
       const res = await registerRequest(user);
-      console.log("Respuesta completa de signup:", res);
 
-      const token = res.data?.token; 
+      const token = res.data?.token;
       const userData = res.data?.user;
       if (token && userData) {
         setUser(userData);
@@ -43,7 +45,7 @@ export const AuthProvider = ({ children }) => {
       const res = await loginRequest(userData);
       console.log("Respuesta de inicio de sesión:", res.data);
 
-      const token = res.data?.user?.token; 
+      const token = res.data?.user?.token;
       if (token) {
         setUser(res.data.user);
         setIsAuthenticated(true);
@@ -81,6 +83,8 @@ export const AuthProvider = ({ children }) => {
       }
 
       try {
+        console.log(token);
+        console.log("se ejecuto verifyTokenRequest");
         const res = await verifyTokenRequest(token);
         console.log("Respuesta de verificación de token:", res.data);
 
