@@ -19,7 +19,7 @@ function TasksPage() {
     };
 
     fetchTasks();
-  }, [getTasks]); 
+  }, [getTasks]);
 
   const handleDelete = async (id) => {
     try {
@@ -33,14 +33,12 @@ function TasksPage() {
   if (error) return <p>{error}</p>;
   if (!tasks.length) return <p>No hay tareas</p>;
 
+  console.log(tasks);
+
   return (
     <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-2">
       {tasks.map((task) => (
-        <TaskCard
-          key={task._id}
-          task={task}
-          onDelete={handleDelete}
-        />
+        <TaskCard key={task._id} task={task} onDelete={handleDelete} />
       ))}
     </div>
   );

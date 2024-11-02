@@ -9,7 +9,7 @@ function RegisterPage() {
     handleSubmit,
     formState: { errors },
   } = useForm();
-  const { signup, authState, errors: registerErrors } = useAuth();
+  const { signup, authState, errors: registerErrors = [] } = useAuth(); // Default to an empty array
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -23,11 +23,13 @@ function RegisterPage() {
   return (
     <div className="flex h-[calc(100vh-100px)] items-center justify-center">
       <div className="bg-zinc-800 max-w-md p-10 rounded-md">
-        {registerErrors.map((error, i) => (
-          <p className="bg-red-500 p-2 text-white my-2" key={i}>
-            {error}
-          </p>
-        ))}
+        {Array.isArray(registerErrors) && registerErrors.length > 0 // Check if it's an array and has items
+          ? registerErrors.map((error, i) => (
+              <p className="bg-red-500 p-2 text-white my-2" key={i}>
+                {error}
+              </p>
+            ))
+          : null}
         <h1 className="text-3xl font-bold my-2">Register</h1>
         <form onSubmit={onSubmit}>
           <input
