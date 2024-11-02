@@ -10,7 +10,7 @@ function LoginPage() {
     formState: { errors },
   } = useForm();
 
-  const { signin, errors: signinErrors, isAuthenticated } = useAuth();
+  const { signin, errors: signinErrors, authState } = useAuth();
   const navigate = useNavigate();
 
   const onSubmit = handleSubmit((data) => {
@@ -18,8 +18,8 @@ function LoginPage() {
   });
 
   useEffect(() => {
-    if (isAuthenticated) navigate("/tasks");
-  }, [isAuthenticated]);
+    if (authState.isLogged) navigate("/tasks");
+  }, [authState.isLogged]);
 
   return (
     <div className="flex h-[calc(100vh-100px)] items-center justify-center">
@@ -55,7 +55,12 @@ function LoginPage() {
               Password is required for the registration{" "}
             </p>
           )}
-          <button type="submit" className="bg-sky-500 text-white px-4 py-2 rounded-md my-2">Login</button>
+          <button
+            type="submit"
+            className="bg-sky-500 text-white px-4 py-2 rounded-md my-2"
+          >
+            Login
+          </button>
           <p className="flex gap-x-2 justify-between">
             Don't have an account?{" "}
             <Link to="/register" className=" text-sky-500">

@@ -2,14 +2,14 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 function Navbar() {
-  const { isAuthenticated, logout } = useAuth();
-
+  const { authState, logout } = useAuth();
+  console.log(authState);
   return (
     <nav className="bg-zinc-700 my-3 flex justify-between py-5 px-10 rounded-lg">
-      <Link to={isAuthenticated ? "/tasks" : "/"}>
+      <Link to={authState.isLogged ? "/tasks" : "/"}>
         <h1 className="text-2xl font-bold">Gestor de Tareas</h1>
       </Link>
-      {isAuthenticated ? (
+      {authState.isLogged ? (
         <>
           <ul className="flex gap-x-2">
             <li>
