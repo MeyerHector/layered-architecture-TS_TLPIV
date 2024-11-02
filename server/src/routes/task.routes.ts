@@ -31,6 +31,14 @@ class TaskRoutes {
     this.router.patch("/tasks/:id", validateToken, (req, res) => {
       this.taskController.markTaskAsCompletedOrNot(req, res);
     });
+
+    this.router.get("/all-tasks-completed", validateToken, (req, res) => {
+      this.taskController.getCompletedTasks(req, res);
+    });
+
+    this.router.get("/all-tasks-not-completed", validateToken, (req, res) => {
+      this.taskController.getIncompleteTasks(req, res);
+    });
   }
 }
 

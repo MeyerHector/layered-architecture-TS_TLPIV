@@ -47,4 +47,18 @@ export class TaskRepository {
     }
     return await task.update({ completed: !task.completed });
   }
+
+  public async getCompletedTasks(userId: string) {
+    return await Task.findAll({
+      where: { userId, completed: true },
+      include: [User],
+    });
+  }
+
+  public async getIncompleteTasks(userId: string) {
+    return await Task.findAll({
+      where: { userId, completed: false },
+      include: [User],
+    });
+  }
 }

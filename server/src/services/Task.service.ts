@@ -64,4 +64,12 @@ export class TaskService {
       throw new Error(error.message);
     }
   }
+
+  public async getCompletedTasks(userId: string) {
+    return await this.taskRepository.getCompletedTasks(userId);
+  }
+
+  public async getIncompleteTasks(userId: string) {
+    return await this.taskRepository.getIncompleteTasks(userId);
+  }
 }
