@@ -78,9 +78,8 @@ export const AuthProvider = ({ children }) => {
       }
 
       try {
-        const res = await verifyTokenRequest(token);
-        console.log("check login", res);
-        if (res.data !== 200) {
+        const res = await verifyTokenRequest();
+        if (res.status !== 200) {
           setIsAuthenticated(false);
           setUser(null);
           return;
@@ -98,7 +97,6 @@ export const AuthProvider = ({ children }) => {
 
     checkLogin();
   }, []);
-
   return (
     <AuthContext.Provider
       value={{ signup, signin, logout, loading, user, isAuthenticated, errors }}
