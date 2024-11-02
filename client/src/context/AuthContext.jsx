@@ -16,6 +16,7 @@ export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [errors, setErrors] = useState([]);
   const [loading, setLoading] = useState(true);
+  const token = localStorage.getItem("token");
   const initialState = {
     token: token ? token : null,
     isLogged: false,
@@ -30,7 +31,6 @@ export const AuthProvider = ({ children }) => {
         setUser(userData);
         setIsAuthenticated(true);
         localStorage.setItem("token", token);
-        console.log("Token almacenado:", token);
       } else {
         setErrors(["Error: Token o datos de usuario no encontrados"]);
       }
@@ -43,17 +43,12 @@ export const AuthProvider = ({ children }) => {
   const signin = async (userData) => {
     try {
       const res = await loginRequest(userData);
-      console.log("Respuesta de inicio de sesión:", res.data);
-
-      const token = res.data?.user?.token;
-      if (token) {
-        setUser(res.data.user);
-        setIsAuthenticated(true);
-        localStorage.setItem("token", token);
-        console.log("Token almacenado:", token);
-      } else {
-        setErrors(["Error: Token no encontrado"]);
+      if (res.status !== 200) {
+        return setErrors(["Error: Token no encontrado"]);
       }
+      setUser(res.data.user);
+      setIsAuthenticated(true);
+      localStorage.setItem("token", res.data.token);
     } catch (error) {
       console.error("Error en signin:", error.response);
       setErrors(error.response?.data || ["Error en el inicio de sesión"]);
@@ -83,18 +78,15 @@ export const AuthProvider = ({ children }) => {
       }
 
       try {
-        console.log(token);
-        console.log("se ejecuto verifyTokenRequest");
         const res = await verifyTokenRequest(token);
-        console.log("Respuesta de verificación de token:", res.data);
-
-        if (res.data && res.data.user) {
-          setIsAuthenticated(true);
-          setUser(res.data.user);
-        } else {
+        console.log("check login", res);
+        if (res.data !== 200) {
           setIsAuthenticated(false);
           setUser(null);
+          return;
         }
+        setIsAuthenticated(true);
+        setUser(res.data.user);
       } catch (error) {
         console.log("Error en la verificación del token:", error);
         setIsAuthenticated(false);

@@ -60,8 +60,6 @@ export class AuthController {
 
     jwt.verify(token, JWT_SECRET_KEY, async (err: any, user: any) => {
       if (err) {
-        console.log("aca no cumple");
-        console.log(err);
         return res.status(401).json({ message: "Token no valido" });
       }
 
@@ -69,7 +67,10 @@ export class AuthController {
       if (!userFound) {
         return res.status(404).json({ message: "Usuario no encontrado" });
       }
-      res.status(200).json({ user: userFound });
+      const token = jwt.sign({ id: userFound.id }, JWT_SECRET_KEY, {
+        expiresIn: "1h",
+      });
+      res.status(200).json({ user: userFound, token });
     });
   }
 }
