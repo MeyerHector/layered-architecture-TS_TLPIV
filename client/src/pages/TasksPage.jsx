@@ -3,9 +3,11 @@ import { useTasks } from "../context/TaskContext";
 import TaskCard from "../components/TaskCard";
 
 function TasksPage() {
-  const { getTasks, tasks, deleteTask } = useTasks();
+  const { getTasks, tasks, getAllCompletedTasks, getAllUncompletedTasks } =
+    useTasks();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [view, setView] = useState("all");
 
   useEffect(() => {
     const fetchTasks = async () => {
@@ -19,29 +21,61 @@ function TasksPage() {
     };
 
     fetchTasks();
-  }, [getTasks]); 
+  }, [getTasks]);
 
-  const handleDelete = async (id) => {
-    try {
-      await deleteTask(id);
-    } catch (error) {
-      console.log("Error al eliminar la tarea:", error);
+  const filteredTasks = () => {
+    switch (view) {
+      case "completed":
+        return tasks.filter((task) => task.completed);
+      case "uncompleted":
+        return tasks.filter((task) => !task.completed);
+      default:
+        return tasks;
     }
   };
 
-  if (loading) return <p>Cargando tareas...</p>;
+  if (loading) return <p>Cargando...</p>;
   if (error) return <p>{error}</p>;
-  if (!tasks.length) return <p>No hay tareas</p>;
 
   return (
-    <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-2">
-      {tasks.map((task) => (
-        <TaskCard
-          key={task._id}
-          task={task}
-          onDelete={handleDelete}
-        />
-      ))}
+    <div>
+      <nav className="mb-4 flex justify-center space-x-4">
+        <button
+          onClick={() => setView("all")}
+          className={`px-4 py-2 rounded-md ${
+            view === "all"
+              ? "bg-blue-500 text-white"
+              : "bg-gray-200 text-gray-700"
+          }`}
+        >
+          Todas las tareas
+        </button>
+        <button
+          onClick={() => setView("completed")}
+          className={`px-4 py-2 rounded-md ${
+            view === "completed"
+              ? "bg-blue-500 text-white"
+              : "bg-gray-200 text-gray-700"
+          }`}
+        >
+          Tareas completas
+        </button>
+        <button
+          onClick={() => setView("uncompleted")}
+          className={`px-4 py-2 rounded-md ${
+            view === "uncompleted"
+              ? "bg-blue-500 text-white"
+              : "bg-gray-200 text-gray-700"
+          }`}
+        >
+          Tareas incompletas
+        </button>
+      </nav>
+      <div className="grid grid-cols-1 gap-4">
+        {filteredTasks().map((task) => (
+          <TaskCard key={task.id} task={task} />
+        ))}
+      </div>
     </div>
   );
 }

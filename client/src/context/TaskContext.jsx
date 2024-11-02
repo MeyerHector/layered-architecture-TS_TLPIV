@@ -88,6 +88,13 @@ export function TaskProvider({ children }) {
       console.log(error);
     }
   };
+  const getAllCompletedTasks = () => {
+    return tasks.filter((task) => task.completed);
+  };
+
+  const getAllUncompletedTasks = () => {
+    return tasks.filter((task) => !task.completed);
+  };
 
   return (
     <TaskContext.Provider
@@ -99,6 +106,8 @@ export function TaskProvider({ children }) {
         deleteTask,
         updateTask,
         markTaskAsCompletedOrNot,
+        getAllCompletedTasks,
+        getAllUncompletedTasks,
       }}
     >
       {children}

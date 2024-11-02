@@ -45,3 +45,25 @@ export const markTaskAsCompletedOrNotRequest = (id) =>
       },
     }
   );
+
+export const getAllCompletedTasks = () =>
+  axios.get(
+    "/api/all-tasks-completed",
+    {},
+    {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    }
+  );
+export const getAllUncompletedTasks = () => {
+  return axios.get(
+    "/api/all-tasks-not-completed",
+    {},
+    {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    }
+  );
+};
