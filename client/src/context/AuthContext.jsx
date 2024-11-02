@@ -48,7 +48,7 @@ export const AuthProvider = ({ children }) => {
   const signup = async (user) => {
     const res = await registerRequest(user);
 
-    if (res.status !== 200) {
+    if (res.status !== 201) {
       return setErrors(["Error al iniciar sesión"]);
     }
     if (res.data.token && res.data.user) {

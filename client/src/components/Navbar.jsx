@@ -3,7 +3,6 @@ import { useAuth } from "../context/AuthContext";
 
 function Navbar() {
   const { authState, logout } = useAuth();
-  console.log(authState);
   return (
     <nav className="bg-zinc-700 my-3 flex justify-between py-5 px-10 rounded-lg">
       <Link to={authState.isLogged ? "/tasks" : "/"}>
@@ -13,7 +12,7 @@ function Navbar() {
         <>
           <ul className="flex gap-x-2">
             <li>
-              <h1 className="text-white">Bienvenido!</h1>
+              <h1 className="text-white">Bienvenido {authState.user.name}!</h1>
             </li>
             <li>
               <Link
