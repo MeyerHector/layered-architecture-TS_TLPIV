@@ -1,6 +1,12 @@
-import { createContext, useState, useContext, useEffect } from "react";
+import {
+  createContext,
+  useState,
+  useContext,
+  useEffect,
+  useReducer,
+} from "react";
 import { registerRequest, loginRequest, verifyTokenRequest } from "../api/auth";
-
+import { authReducer } from "./AuthReducer";
 export const AuthContext = createContext();
 
 export const useAuth = () => {
@@ -12,31 +18,52 @@ export const useAuth = () => {
 };
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [errors, setErrors] = useState([]);
-  const [loading, setLoading] = useState(true);
   const token = localStorage.getItem("token");
   const initialState = {
+    user: {},
     token: token ? token : null,
     isLogged: false,
   };
-  const signup = async (user) => {
-    try {
-      const res = await registerRequest(user);
 
-      const token = res.data?.token;
-      const userData = res.data?.user;
-      if (token && userData) {
-        setUser(userData);
-        setIsAuthenticated(true);
-        localStorage.setItem("token", token);
-      } else {
-        setErrors(["Error: Token o datos de usuario no encontrados"]);
-      }
-    } catch (error) {
-      console.log("Error en signup:", error.response);
-      setErrors(error.response?.data || ["Error en el registro"]);
+  const [authState, dispatch] = useReducer(authReducer, initialState);
+  const validateToken = async (token) => {
+    const res = await verifyTokenRequest(token);
+    if (res.status !== 200) {
+      localStorage.removeItem("token");
+      dispatch({ type: "LOGOUT" });
+      return;
+    }
+
+    dispatch({
+      type: "LOGIN",
+      payload: {
+        user: res.data.user,
+        token: res.data.token,
+        isLogged: true,
+      },
+    });
+  };
+
+  const signup = async (user) => {
+    const res = await registerRequest(user);
+
+    if (res.status !== 201) {
+      return setErrors(["Error al iniciar sesión"]);
+    }
+    if (res.data.token && res.data.user) {
+      dispatch({
+        type: "LOGIN",
+        payload: {
+          user: res.data.user,
+          token: res.data.token,
+          isLogged: true,
+        },
+      });
+
+      localStorage.setItem("token", res.data.token);
+    } else {
+      setErrors(["Error: Token o datos de usuario no encontrados"]);
     }
   };
 
@@ -46,19 +73,23 @@ export const AuthProvider = ({ children }) => {
       if (res.status !== 200) {
         return setErrors(["Error: Token no encontrado"]);
       }
-      setUser(res.data.user);
-      setIsAuthenticated(true);
+      dispatch({
+        type: "LOGIN",
+        payload: {
+          user: res.data.user,
+          token: res.data.token,
+          isLogged: true,
+        },
+      });
       localStorage.setItem("token", res.data.token);
     } catch (error) {
-      console.error("Error en signin:", error.response);
       setErrors(error.response?.data || ["Error en el inicio de sesión"]);
     }
   };
 
   const logout = () => {
+    dispatch({ type: "LOGOUT" });
     localStorage.removeItem("token");
-    setIsAuthenticated(false);
-    setUser(null);
     navigate("/rs");
   };
 
@@ -70,37 +101,11 @@ export const AuthProvider = ({ children }) => {
   }, [errors]);
 
   useEffect(() => {
-    const checkLogin = async () => {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        setLoading(false);
-        return;
-      }
+    if (token) validateToken(token);
+  }, [token]);
 
-      try {
-        const res = await verifyTokenRequest();
-        if (res.status !== 200) {
-          setIsAuthenticated(false);
-          setUser(null);
-          return;
-        }
-        setIsAuthenticated(true);
-        setUser(res.data.user);
-      } catch (error) {
-        console.log("Error en la verificación del token:", error);
-        setIsAuthenticated(false);
-        setUser(null);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    checkLogin();
-  }, []);
   return (
-    <AuthContext.Provider
-      value={{ signup, signin, logout, loading, user, isAuthenticated, errors }}
-    >
+    <AuthContext.Provider value={{ signup, signin, logout, authState, errors }}>
       {children}
     </AuthContext.Provider>
   );

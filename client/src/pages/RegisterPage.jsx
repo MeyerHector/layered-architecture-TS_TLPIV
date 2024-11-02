@@ -9,12 +9,12 @@ function RegisterPage() {
     handleSubmit,
     formState: { errors },
   } = useForm();
-  const { signup, isAuthenticated, errors: registerErrors } = useAuth();
+  const { signup, authState, errors: registerErrors } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (isAuthenticated) navigate("/tasks");
-  }, [isAuthenticated, navigate]);
+    if (authState.isLogged) navigate("/tasks");
+  }, [authState.isLogged, navigate]);
 
   const onSubmit = handleSubmit(async (values) => {
     signup(values);
