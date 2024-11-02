@@ -55,4 +55,13 @@ export class TaskService {
       throw new Error(error.message);
     }
   }
+
+  public async markTaskAsCompletedOrNot(taskId: string) {
+    try {
+      const task = await this.taskRepository.markTaskAsCompletedOrNot(taskId);
+      return task;
+    } catch (error: any) {
+      throw new Error(error.message);
+    }
+  }
 }

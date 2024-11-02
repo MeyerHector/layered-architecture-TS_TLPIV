@@ -28,6 +28,9 @@ class TaskRoutes {
     this.router.delete("/tasks/:id", validateToken, (req, res) =>
       this.taskController.deleteTask(req, res)
     );
+    this.router.patch("/tasks/:id", validateToken, (req, res) => {
+      this.taskController.markTaskAsCompletedOrNot(req, res);
+    });
   }
 }
 

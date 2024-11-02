@@ -39,4 +39,12 @@ export class TaskRepository {
   public async deleteTask(taskId: string) {
     return await Task.destroy({ where: { id: taskId } });
   }
+
+  public async markTaskAsCompletedOrNot(taskId: string) {
+    const task = await Task.findByPk(taskId);
+    if (!task) {
+      throw new Error("Task not found");
+    }
+    return await task.update({ completed: !task.completed });
+  }
 }
