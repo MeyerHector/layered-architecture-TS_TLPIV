@@ -20,27 +20,31 @@ export const validateToken = async (
   res: Response,
   next: NextFunction
 ): Promise<void> => {
-  if (!req.headers.authorization) {
-    console.log("headers");
-    console.log(req.headers);
-    res.status(401).json({ message: "No estas autenticado" });
+  try {
+    if (!req.headers.authorization) {
+      console.log("headers");
+      console.log(req.headers);
+      res.status(401).json({ message: "No estas autenticado" });
+    }
+
+    let token = req.headers.authorization;
+    console.log("token back", token);
+    token = token?.split(" ")[1];
+
+    if (!token) throw new Error("Inicie sesión para continuar");
+
+    const verifytoken = jwt.verify(token, JWT_SECRET_KEY) as JwtPayload;
+    if (!verifytoken) res.status(401).json({ message: "Token no valido" });
+
+    let user = await new UserService().getUserById(verifytoken.id);
+    if (!user) {
+      res.status(404).json({ message: "Usuario no encontrado" });
+      return;
+    }
+
+    req.user = user;
+    next();
+  } catch (error) {
+    res.status(401).json({ message: error });
   }
-
-  let token = req.headers.authorization;
-  console.log("token back", token);
-  token = token?.split(" ")[1];
-
-  if (!token) throw new Error("Inicie sesión para continuar");
-
-  const verifytoken = jwt.verify(token, JWT_SECRET_KEY) as JwtPayload;
-  if (!verifytoken) res.status(401).json({ message: "Token no valido" });
-
-  let user = await new UserService().getUserById(verifytoken.id);
-  if (!user) {
-    res.status(404).json({ message: "Usuario no encontrado" });
-    return;
-  }
-
-  req.user = user;
-  next();
 };

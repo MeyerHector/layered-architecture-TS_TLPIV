@@ -1,27 +1,31 @@
 import { Request, Response } from "express";
 import { TaskService } from "../services/Task.service";
 import { CreateTask } from "../interfaces/create-task.interface";
+import db from "../config/db";
 
 export class TaskController {
   public taskService: TaskService;
 
   constructor() {
-    this.taskService = new TaskService();
+    this.taskService = new TaskService(db);
 
     this.createTask = this.createTask.bind(this);
   }
 
   public async createTask(req: Request, res: Response): Promise<void> {
     try {
-      const { title, date, description } = req.body as CreateTask;
+      const { title, date, description, subTasks } = req.body as CreateTask;
+      console.log(req.body);
       const task = await this.taskService.createTask({
         title,
         date,
         description,
         userId: req.user.id,
+        subTasks,
       });
       res.status(201).json(task);
     } catch (error: any) {
+      console.log(error);
       res.status(500).json({ message: error.message });
     }
   }
