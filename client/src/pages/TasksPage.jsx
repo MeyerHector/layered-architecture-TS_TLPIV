@@ -3,8 +3,7 @@ import { useTasks } from "../context/TaskContext";
 import TaskCard from "../components/TaskCard";
 
 function TasksPage() {
-  const { getTasks, tasks, getAllCompletedTasks, getAllUncompletedTasks } =
-    useTasks();
+  const { getTasks, tasks } = useTasks();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [view, setView] = useState("all");
@@ -24,14 +23,12 @@ function TasksPage() {
   }, [getTasks]);
 
   const filteredTasks = () => {
-    switch (view) {
-      case "completed":
-        return tasks.filter((task) => task.completed);
-      case "uncompleted":
-        return tasks.filter((task) => !task.completed);
-      default:
-        return tasks;
-    }
+    const filtered = tasks.filter((task) => {
+      if (view === "completed") return task.completed;
+      if (view === "uncompleted") return !task.completed;
+      return true;
+    });
+    return filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
   };
 
   if (loading) return <p>Cargando...</p>;

@@ -1,18 +1,15 @@
 import db from "./db";
 
 export const connectDB = async () => {
-    db.authenticate() 
-        .then(() => {
-            console.log('database connection successful 🚀');
-        })
-        .catch((error) => {
-            console.error('error connecting the database ✖️', error);
-        });
-    await db.sync({force: false})
-        .then(() => {
-            console.log('synchronized tables successfully 🚀');
-        })
-        .catch((error) => {
-            console.error('error synchronizing tables ✖️', error);
-        });
-}
+  try {
+    // Intenta autenticar la conexión a la base de datos
+    await db.authenticate();
+    console.log("Database connection successful 🚀");
+
+    // Sincroniza los modelos con la base de datos
+    await db.sync({ force: false });
+    console.log("Synchronized tables successfully 🚀");
+  } catch (error) {
+    console.error("Error connecting or synchronizing the database ✖️", error);
+  }
+};
