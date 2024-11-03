@@ -35,13 +35,13 @@ function TaskCard({ task }) {
             onClick={handleDelete}
             className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md"
           >
-            <span class="material-symbols-outlined"> delete</span>{" "}
+            <i class="fa-solid fa-delete-left"></i>
           </button>
           <Link
             className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md"
             to={`/tasks/${task.id}`}
           >
-            <span className="material-symbols-outlined">edit</span>
+            <i class="fa-solid fa-pen-to-square"></i>
           </Link>
         </div>
       </header>

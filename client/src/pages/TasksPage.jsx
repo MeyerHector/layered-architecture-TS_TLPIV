@@ -26,9 +26,9 @@ function TasksPage() {
   const filteredTasks = () => {
     switch (view) {
       case "completed":
-        return tasks.filter((task) => task.completed);
+        return getAllCompletedTasks();
       case "uncompleted":
-        return tasks.filter((task) => !task.completed);
+        return getAllUncompletedTasks();
       default:
         return tasks;
     }

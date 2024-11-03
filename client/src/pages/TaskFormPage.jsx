@@ -20,7 +20,8 @@ function TaskFormPage() {
         console.log(tasks);
         setValue("title", tasks.title);
         setValue("description", tasks.description);
-        setValue("date", dayjs(tasks.date).utc().format());
+        setValue("date", dayjs(tasks.date).utc().format("YYYY-MM-DD"));
+        s;
       }
     }
     loadTask();
