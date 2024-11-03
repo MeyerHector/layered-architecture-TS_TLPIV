@@ -5,6 +5,7 @@ import {
   deleteTaskRequest,
   getTaskByIdRequest,
   updateTaskRequest,
+  markTaskAsCompletedOrNotRequest,
 } from "../api/tasks";
 
 const TaskContext = createContext();
@@ -27,7 +28,7 @@ export function TaskProvider({ children }) {
     } catch (error) {
       console.error(error);
     }
-  }, []); 
+  }, []);
 
   const addTask = async (task) => {
     try {
@@ -66,11 +67,33 @@ export function TaskProvider({ children }) {
       const res = await updateTaskRequest(id, task);
       console.log(res);
       setTasks((prevTasks) =>
-        prevTasks.map((t) => (t._id === id ? res.data : t))
+        prevTasks.map((t) => (t.id === id ? res.data : t))
       );
     } catch (error) {
       console.log(error);
     }
+  };
+
+  const markTaskAsCompletedOrNot = async (id) => {
+    try {
+      const res = await markTaskAsCompletedOrNotRequest(id);
+
+      setTasks((prevTasks) =>
+        prevTasks.map((task) =>
+          task.id === id ? { ...task, completed: !task.completed } : task
+        )
+      );
+      console.log(res);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const getAllCompletedTasks = () => {
+    return tasks.filter((task) => task.completed);
+  };
+
+  const getAllUncompletedTasks = () => {
+    return tasks.filter((task) => !task.completed);
   };
 
   return (
@@ -82,6 +105,9 @@ export function TaskProvider({ children }) {
         getTaskById,
         deleteTask,
         updateTask,
+        markTaskAsCompletedOrNot,
+        getAllCompletedTasks,
+        getAllUncompletedTasks,
       }}
     >
       {children}
