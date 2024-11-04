@@ -23,6 +23,14 @@ function Navbar() {
               </Link>
             </li>
             <li>
+              <Link
+                to="/calendar" 
+                className="bg-indigo-500 px-4 py-1 rounded-sm"
+              >
+                Ver Calendario
+              </Link>
+            </li>
+            <li>
               <Link to="/" onClick={logout}>
                 Cerrar Sesión
               </Link>

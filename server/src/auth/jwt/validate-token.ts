@@ -22,13 +22,10 @@ export const validateToken = async (
 ): Promise<void> => {
   try {
     if (!req.headers.authorization) {
-      console.log("headers");
-      console.log(req.headers);
       res.status(401).json({ message: "No estas autenticado" });
     }
 
     let token = req.headers.authorization;
-    console.log("token back", token);
     token = token?.split(" ")[1];
 
     if (!token) throw new Error("Inicie sesión para continuar");

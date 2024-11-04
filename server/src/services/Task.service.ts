@@ -22,7 +22,6 @@ export class TaskService {
         userId,
         t
       );
-      console.log("task principal id", task.id);
       if (subTasks) {
         for (const subTask of subTasks) {
           await this.taskRepository.createSubTask(
@@ -37,8 +36,6 @@ export class TaskService {
       await t.commit();
       return task;
     } catch (error: any) {
-      console.log("error AAAAAAAAAAAAAAAAA");
-      console.log(error);
       await t.rollback();
       throw new Error(error.message);
     }
@@ -49,7 +46,9 @@ export class TaskService {
   }
 
   public async getTaskById(taskId: string) {
-    return await this.taskRepository.getTaskById(taskId);
+    const task = await this.taskRepository.getTaskById(taskId);
+    console.log("task", task);
+    return task;
   }
 
   public async updateTask(taskId: string, taskData: CreateTask) {
@@ -75,5 +74,22 @@ export class TaskService {
     } catch (error: any) {
       throw new Error(error.message);
     }
+  }
+
+  public async markTaskAsCompletedOrNot(taskId: string) {
+    try {
+      const task = await this.taskRepository.markTaskAsCompletedOrNot(taskId);
+      return task;
+    } catch (error: any) {
+      throw new Error(error.message);
+    }
+  }
+
+  public async getCompletedTasks(userId: string) {
+    return await this.taskRepository.getCompletedTasks(userId);
+  }
+
+  public async getIncompleteTasks(userId: string) {
+    return await this.taskRepository.getIncompleteTasks(userId);
   }
 }

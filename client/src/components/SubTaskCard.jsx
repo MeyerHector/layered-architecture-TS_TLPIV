@@ -1,7 +1,7 @@
 import React from "react";
 import { useNoti } from "../hooks/useNoti";
 
-const SubTaskCard = ({ subTask, subTasks, setSubTasks, i }) => {
+const SubTaskCard = ({ subTask, subTasks, setSubTasks, i, setOpenModal }) => {
   const noti = useNoti();
   const onDelete = () => {
     setSubTasks(subTasks.filter((subTask, index) => index !== i));
@@ -16,6 +16,7 @@ const SubTaskCard = ({ subTask, subTasks, setSubTasks, i }) => {
       ...subTask,
       submit: false,
     };
+    setOpenModal(true);
     setSubTasks(updatedSubTasks);
   };
   return (

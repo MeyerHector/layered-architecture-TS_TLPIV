@@ -10,7 +10,7 @@ function LoginPage() {
     formState: { errors },
   } = useForm();
 
-  const { signin, errors: signinErrors, authState } = useAuth();
+  const { signin, errors: signinErrors = [], authState } = useAuth(); // Asegúrate de que signinErrors sea un array
   const navigate = useNavigate();
 
   const onSubmit = handleSubmit((data) => {
@@ -24,12 +24,12 @@ function LoginPage() {
   return (
     <div className="flex h-[calc(100vh-100px)] items-center justify-center">
       <div className="bg-zinc-800 max-w-md w-full p-10 rounded-md">
-        {signinErrors.map((error, i) => (
+        {Array.isArray(signinErrors) && signinErrors.map((error, i) => (
           <p className="bg-red-500 p-2 text-white text-center my-2" key={i}>
             {error}
           </p>
         ))}
-        <h1 className="text-3xl font-bold my-2  ">Login</h1>
+        <h1 className="text-3xl font-bold my-2">Login</h1>
         <form onSubmit={onSubmit}>
           <input
             type="email"
@@ -39,8 +39,7 @@ function LoginPage() {
           />
           {errors.email && (
             <p className="text-red-500 text-xs italic">
-              {" "}
-              Email is required for the registration{" "}
+              Email is required for the registration
             </p>
           )}
           <input
@@ -51,8 +50,7 @@ function LoginPage() {
           />
           {errors.password && (
             <p className="text-red-500 text-xs italic">
-              {" "}
-              Password is required for the registration{" "}
+              Password is required for the registration
             </p>
           )}
           <button
@@ -63,7 +61,7 @@ function LoginPage() {
           </button>
           <p className="flex gap-x-2 justify-between">
             Don't have an account?{" "}
-            <Link to="/register" className=" text-sky-500">
+            <Link to="/register" className="text-sky-500">
               Sign up
             </Link>
           </p>

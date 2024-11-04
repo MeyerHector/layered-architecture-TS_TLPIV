@@ -26,7 +26,6 @@ export class TaskRepository {
     userId: string | undefined,
     t: sequelize.Transaction
   ) {
-    console.log("parentId en createSubTask", parentId);
     return await Task.create(
       {
         title,
@@ -56,12 +55,11 @@ export class TaskRepository {
 
   public async getTaskById(taskId: string) {
     const task = await Task.findByPk(taskId, { include: [User] });
-    if (!task) {
-      return null;
+    if (task) {
+      const subtasks = await Task.findAll({ where: { parentId: taskId } });
+      task.setDataValue("subTasks", subtasks);
     }
-    const subtasks = await Task.findAll({ where: { parentId: taskId } });
-    task.setDataValue("subTasks", subtasks);
-    return;
+    return task;
   }
 
   public async updateTask(
@@ -79,5 +77,27 @@ export class TaskRepository {
 
   public async deleteTask(taskId: string) {
     return await Task.destroy({ where: { id: taskId } });
+  }
+
+  public async markTaskAsCompletedOrNot(taskId: string) {
+    const task = await Task.findByPk(taskId);
+    if (!task) {
+      throw new Error("Task not found");
+    }
+    return await task.update({ completed: !task.completed });
+  }
+
+  public async getCompletedTasks(userId: string) {
+    return await Task.findAll({
+      where: { userId, completed: true },
+      include: [User],
+    });
+  }
+
+  public async getIncompleteTasks(userId: string) {
+    return await Task.findAll({
+      where: { userId, completed: false },
+      include: [User],
+    });
   }
 }

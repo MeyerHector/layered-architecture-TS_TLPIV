@@ -22,7 +22,6 @@ export class AuthService {
 
       // Verificar si el email ya existe usando el repositorio
       const exist_email = await this.authRepository.findUserByEmail(email);
-      console.log(exist_email);
       if (exist_email) {
         throw new Error("Email already exists");
       }

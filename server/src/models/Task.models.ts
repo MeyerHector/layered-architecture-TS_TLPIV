@@ -38,6 +38,13 @@ export class Task extends Model {
   description!: string;
 
   @Column({
+    type: DataType.BOOLEAN,
+    defaultValue: false,
+    allowNull: false,
+  })
+  completed!: boolean;
+
+  @Column({
     type: DataType.DATE,
     allowNull: true,
   })
@@ -51,10 +58,18 @@ export class Task extends Model {
   userId!: string;
 
   @ForeignKey(() => Task)
-  @BelongsTo(() => Task, { foreignKey: "parentId", as: "ParentTask" })
+  @BelongsTo(() => Task, {
+    foreignKey: "parentId",
+    onDelete: "CASCADE",
+    as: "ParentTask",
+  })
   parentId!: Task;
 
-  @HasMany(() => Task, { foreignKey: "parentId", as: "SubTasks" })
+  @HasMany(() => Task, {
+    foreignKey: "parentId",
+    onDelete: "CASCADE",
+    as: "SubTasks",
+  })
   subTasks!: Task[];
 
   @BelongsTo(() => User)

@@ -2,13 +2,9 @@ import { useForm } from "react-hook-form";
 import { useTasks } from "../context/TaskContext";
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-
-import dayjs from "dayjs";
-import utc from "dayjs/plugin/utc";
 import SubTaskForm from "../components/SubTaskForm";
 import SubTaskCard from "../components/SubTaskCard";
 import { useNoti } from "../hooks/useNoti";
-dayjs.extend(utc);
 
 function TaskFormPage() {
   const [openSubTaskForm, setOpenSubTaskForm] = useState(false);
@@ -18,14 +14,17 @@ function TaskFormPage() {
   const navigate = useNavigate();
   const [subTasks, setSubTasks] = useState([]);
   const noti = useNoti();
+  console.log(subTasks);
   useEffect(() => {
     async function loadTask() {
       if (params.id) {
         const tasks = await getTaskById(params.id);
-        console.log(tasks);
         setValue("title", tasks.title);
         setValue("description", tasks.description);
-        setValue("date", dayjs(tasks.date).utc().format());
+        setValue("date", new Date(tasks.date).toISOString().split("T")[0]);
+        setSubTasks(
+          tasks.subTasks.map((subTask) => ({ ...subTask, submit: true }))
+        );
       }
     }
     loadTask();
@@ -33,15 +32,16 @@ function TaskFormPage() {
 
   const onSubmit = async (data) => {
     data.subTasks = subTasks;
-    const dataValid = {
-      ...data,
-      date: data.date ? dayjs.utc(data.date).format() : dayjs.utc().format(),
-    };
+
+    if (data.date < new Date().toISOString().split("T")[0]) {
+      noti("La fecha de vencimiento no puede ser menor a la actual", "error");
+      return;
+    }
 
     if (params.id) {
-      await updateTask(params.id, dataValid);
+      await updateTask(params.id, data);
     } else {
-      await addTask(dataValid);
+      await addTask(data);
     }
 
     navigate("/tasks");
@@ -87,6 +87,7 @@ function TaskFormPage() {
             <label htmlFor="date">Fecha de vencimiento</label>
             <input
               type="date"
+              min={new Date().toISOString().split("T")[0]}
               className="w-full bg-zinc-700 text-white px-4 py-2 rounded-md my-2"
               {...register("date")}
             />
@@ -115,6 +116,7 @@ function TaskFormPage() {
                 subTask={subTask}
                 subTasks={subTasks}
                 setSubTasks={setSubTasks}
+                setOpenModal={setOpenSubTaskForm}
                 i={i}
               />
             ) : (
