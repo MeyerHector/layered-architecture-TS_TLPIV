@@ -1,6 +1,17 @@
-import { Table, Model, Column, DataType, PrimaryKey, Default, ForeignKey, BelongsTo } from "sequelize-typescript";
+import {
+  Table,
+  Model,
+  Column,
+  DataType,
+  PrimaryKey,
+  Default,
+  ForeignKey,
+  BelongsTo,
+  HasMany,
+} from "sequelize-typescript";
 import { v4 as uuidv4 } from "uuid";
 import { User } from "./User.model";
+
 
 enum Importance {
     URGENTE = "URGENTE",
@@ -10,10 +21,11 @@ enum Importance {
 }
 
 @Table({
-    timestamps: true,
-    tableName: 'tasks',
+  timestamps: true,
+  tableName: "tasks",
 })
 export class Task extends Model {
+
     @Default(uuidv4)
     @PrimaryKey
     @Column({
@@ -54,6 +66,22 @@ export class Task extends Model {
     })
     userId!: string;
 
-    @BelongsTo(() => User)
-    user!: User;
+  @ForeignKey(() => Task)
+  @BelongsTo(() => Task, {
+    foreignKey: "parentId",
+    onDelete: "CASCADE",
+    as: "ParentTask",
+  })
+  parentId!: Task;
+
+  @HasMany(() => Task, {
+    foreignKey: "parentId",
+    onDelete: "CASCADE",
+    as: "SubTasks",
+  })
+  subTasks!: Task[];
+
+  @BelongsTo(() => User)
+  user!: User;
+  completed: any;
 }

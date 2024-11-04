@@ -112,7 +112,6 @@ export default function Component() {
                 <TabsTrigger value="completed">Completadas</TabsTrigger>
                 <TabsTrigger value="overdue">Vencidas</TabsTrigger>
               </TabsList>
-
               <TabsContent value="all">
                 <ScrollArea className="h-[400px] pr-4">
                   {filteredTasks.map((task) => (

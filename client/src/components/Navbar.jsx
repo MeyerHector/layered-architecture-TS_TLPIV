@@ -16,8 +16,23 @@ function Navbar() {
               <h1 className="text-black">Bienvenido {authState.user.name}!</h1>
             </li>
             <li>
-              <Link to="/" onClick={logout} className="text-black">
-                <i className="fa-solid fa-right-from-bracket"></i>
+              <Link
+                to="/add-task"
+                className="bg-indigo-500 px-4 py-1 rounded-sm"
+              >
+                Agrega una Tarea
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/calendar" 
+                className="bg-indigo-500 px-4 py-1 rounded-sm"
+              >
+                Ver Calendario
+              </Link>
+            </li>
+            <li>
+              <Link to="/" onClick={logout}>
                 Cerrar Sesión
               </Link>
             </li>

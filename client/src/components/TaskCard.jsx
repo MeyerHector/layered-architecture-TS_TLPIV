@@ -1,39 +1,97 @@
 import { Link } from "react-router-dom";
 import { useTasks } from "../context/TaskContext";
-import days from "dayjs";
-import utc from 'dayjs/plugin/utc';
-days.extend(utc);
-
+import { Fragment, useState } from "react";
+import { Modal } from "@mui/material";
+import SubTaskCardCheck from "./SubTaskCardCheck";
 function TaskCard({ task }) {
-  const { deleteTask } = useTasks();
+  const { deleteTask, getTasks, markTaskAsCompletedOrNot } = useTasks();
+  const [moreInfo, setMoreInfo] = useState(false);
 
-  const handleDelete = async () => {
-    await deleteTask(task.id); 
+  const handleDelete = async (id) => {
+    await deleteTask(id);
+    await getTasks();
+  };
+
+  const handleComplete = async (id) => {
+    await markTaskAsCompletedOrNot(id);
   };
 
   return (
-    <div className="bg-zinc-800 max-w-md w-full p-10 rounded-md">
+    <div
+      className={`p-4 rounded-md h-fit shadow-md flex flex-col ${
+        task?.completed ? "bg-gray-800" : "bg-gray-700"
+      }`}
+    >
       <header className="flex justify-between">
-        <h1 className="text-2xl font-bold">{task.title}</h1>
+        <div className="flex items-center">
+          <input
+            type="checkbox"
+            checked={task?.completed}
+            onChange={() => handleComplete(task?.id)}
+            className="mr-2 h-6 w-6 rounded-md cursor-pointer border-2 border-gray-500"
+          />
+          <span
+            className={`text-xl font-bold ${
+              task.completed && "line-through text-gray-300"
+            }`}
+          >
+            {task?.title.length > 15
+              ? task?.title.slice(0, 15) + "..."
+              : task?.title}
+          </span>
+        </div>
         <div className="flex gap-x-2 items-center">
           <button
-            onClick={handleDelete} 
-            className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md"
+            onClick={() => handleDelete(task?.id)}
+            className="text-white p-1 rounded-md flex items-center"
           >
-            Eliminar
+            <i className="fa-solid fa-trash"></i>
           </button>
-          <Link 
-            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md"
-            to={`/tasks/${task.id}`}> 
-            Editar
+          <Link
+            className="text-white p-1 rounded-md flex items-center"
+            to={`/tasks/${task?.id}`}
+          >
+            <i className="fa-regular fa-pen-to-square"></i>
           </Link>
+          <button onClick={() => setMoreInfo(!moreInfo)}>
+            {moreInfo ? (
+              <i className="fa-solid fa-angle-up "></i>
+            ) : (
+              <i className="fa-solid fa-angle-down "></i>
+            )}
+          </button>
         </div>
       </header>
-      <p className="text-slate-300">{task.description}</p>
-      <p>{days(task.date).utc().format('DD/MM/YYYY')}</p>
+      <div
+        className={`transition-max-height duration-1000 ease-in-out overflow-hidden ${
+          moreInfo ? "max-h-96" : "max-h-0"
+        }`}
+      >
+        {moreInfo && (
+          <div>
+            <p className="text-gray-300">{task?.description}</p>
+            Fecha límite: {new Date(task?.date).toLocaleDateString()}
+            {task?.subTasks?.length > 0 && (
+              <>
+                <div>
+                  <span>Subtareas ({task?.subTasks.length})</span>
+                </div>
+                <div className="flex flex-col gap-2">
+                  {task?.subTasks.map((subTask, i) => (
+                    <SubTaskCardCheck
+                      key={i}
+                      subTask={subTask}
+                      handleComplete={handleComplete}
+                    />
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
-
 
 export default TaskCard;

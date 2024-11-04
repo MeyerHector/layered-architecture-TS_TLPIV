@@ -1,7 +1,7 @@
 import express, { Application } from "express";
 import cors from "cors";
 import morgan from "morgan";
-
+import "dotenv/config";
 // conexion a la base de datos
 import { connectDB } from "./config/connectDB";
 
@@ -16,7 +16,7 @@ export class Server {
 
   constructor() {
     this.app = express();
-    this.port = Number(process.env.PORT) || 3000;
+    this.port = Number(process.env.PORT) || 4000;
 
     this.connectDB();
     this.middlewares();

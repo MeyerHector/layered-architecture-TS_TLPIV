@@ -29,6 +29,7 @@ export const AuthProvider = ({ children }) => {
   const [authState, dispatch] = useReducer(authReducer, initialState);
   const validateToken = async (token) => {
     const res = await verifyTokenRequest(token);
+    console.log(res);
     if (res.status !== 200) {
       localStorage.removeItem("token");
       dispatch({ type: "LOGOUT" });

@@ -1,3 +1,4 @@
+import sequelize from "sequelize";
 import { Task, User } from "../models";
 
 export class TaskRepository {
@@ -6,7 +7,8 @@ export class TaskRepository {
     description: string,
     date: Date,
     importance: string,
-    userId: string | undefined
+    userId: string | undefined,
+    t: sequelize.Transaction
   ) {
     return await Task.create({
       title,
@@ -14,15 +16,49 @@ export class TaskRepository {
       date,
       importance,
       userId,
-    });
+    }, { transaction: t });
+    }
+  public async createSubTask(
+    title: string,
+    description: string,
+    parentId: string,
+    userId: string | undefined,
+    t: sequelize.Transaction
+  ) {
+    return await Task.create(
+      {
+        title,
+        description,
+        userId,
+        parentId,
+      },
+      { transaction: t }
+    );
   }
 
   public async getTasksByUser(userId: string) {
-    return await Task.findAll({ where: { userId }, include: [User] });
+    const tasks = await Task.findAll({
+      where: { userId, parentId: null },
+      include: [User],
+      order: [["date", "ASC"]],
+    });
+
+    return await Promise.all(
+      tasks.map(async (task) => {
+        const subTasks = await Task.findAll({ where: { parentId: task.id } });
+        task.setDataValue("subTasks", subTasks);
+        return task;
+      })
+    );
   }
 
   public async getTaskById(taskId: string) {
-    return await Task.findByPk(taskId, { include: [User] });
+    const task = await Task.findByPk(taskId, { include: [User] });
+    if (task) {
+      const subtasks = await Task.findAll({ where: { parentId: taskId } });
+      task.setDataValue("subTasks", subtasks);
+    }
+    return task;
   }
 
   public async updateTask(
@@ -41,5 +77,43 @@ export class TaskRepository {
 
   public async deleteTask(taskId: string) {
     return await Task.destroy({ where: { id: taskId } });
+  }
+
+  public async markTaskAsCompletedOrNot(taskId: string) {
+    const task = await Task.findByPk(taskId);
+    if (!task) {
+      throw new Error("Task not found");
+    }
+    return await task.update({ completed: !task.completed });
+  }
+
+  public async getCompletedTasks(userId: string) {
+    const tasks = await Task.findAll({
+      where: { userId, completed: true, parentId: null },
+      include: [User],
+      order: [["date", "ASC"]],
+    });
+    return await Promise.all(
+      tasks.map(async (task) => {
+        const subTasks = await Task.findAll({ where: { parentId: task.id } });
+        task.setDataValue("subTasks", subTasks);
+        return task;
+      })
+    );
+  }
+
+  public async getIncompleteTasks(userId: string) {
+    const tasks = await Task.findAll({
+      where: { userId, completed: false, parentId: null },
+      include: [User],
+      order: [["date", "ASC"]],
+    });
+    return await Promise.all(
+      tasks.map(async (task) => {
+        const subTasks = await Task.findAll({ where: { parentId: task.id } });
+        task.setDataValue("subTasks", subTasks);
+        return task;
+      })
+    );
   }
 }

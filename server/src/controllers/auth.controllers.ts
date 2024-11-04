@@ -51,12 +51,10 @@ export class AuthController {
 
   public async verifyToken(req: Request, res: Response) {
     let token = req.headers.authorization;
-    console.log(token);
     if (!token) {
       return res.status(401).json({ message: "No estas autenticado" });
     }
     token = token.split(" ")[1];
-    console.log(token);
 
     jwt.verify(token, JWT_SECRET_KEY, async (err: any, user: any) => {
       if (err) {

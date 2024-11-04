@@ -5,6 +5,7 @@ import {
   deleteTaskRequest,
   getTaskByIdRequest,
   updateTaskRequest,
+  markTaskAsCompletedOrNotRequest,
 } from "../api/tasks";
 
 const TaskContext = createContext();
@@ -27,7 +28,7 @@ export function TaskProvider({ children }) {
     } catch (error) {
       console.error(error);
     }
-  }, []); 
+  }, []);
 
   const addTask = async (task) => {
     try {
@@ -73,6 +74,28 @@ export function TaskProvider({ children }) {
     }
   };
 
+  const markTaskAsCompletedOrNot = async (id) => {
+    try {
+      const res = await markTaskAsCompletedOrNotRequest(id);
+
+      setTasks((prevTasks) =>
+        prevTasks.map((task) =>
+          task.id === id ? { ...task, completed: !task.completed } : task
+        )
+      );
+      console.log(res);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const getAllCompletedTasks = () => {
+    return tasks.filter((task) => task.completed);
+  };
+
+  const getAllUncompletedTasks = () => {
+    return tasks.filter((task) => !task.completed);
+  };
+
   return (
     <TaskContext.Provider
       value={{
@@ -82,6 +105,9 @@ export function TaskProvider({ children }) {
         getTaskById,
         deleteTask,
         updateTask,
+        markTaskAsCompletedOrNot,
+        getAllCompletedTasks,
+        getAllUncompletedTasks,
       }}
     >
       {children}
