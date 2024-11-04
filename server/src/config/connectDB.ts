@@ -9,7 +9,6 @@ export const connectDB = async () => {
       console.error("error connecting the database ✖️", error);
     });
   await db;
-  // .sync({ force: true })
   // .then(() => {
   //   console.log("synchronized tables successfully 🚀");
   // })
