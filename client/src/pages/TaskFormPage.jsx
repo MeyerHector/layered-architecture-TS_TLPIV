@@ -21,6 +21,7 @@ function TaskFormPage() {
         setValue("title", tasks.title);
         setValue("description", tasks.description);
         setValue("date", dayjs(tasks.date).utc().format());
+        setValue("importance", tasks.importance); 
       }
     }
     loadTask();
@@ -53,21 +54,35 @@ function TaskFormPage() {
             {...register("title")}
             autoFocus
           />
+          
           <label htmlFor="description">Description</label>
-
           <textarea
             rows="3"
             placeholder="Description"
             className="w-full bg-zinc-700 text-white px-4 py-2 rounded-md my-2"
             {...register("description")}
           ></textarea>
+          
           <label htmlFor="date">Date</label>
           <input
             type="date"
             className="w-full bg-zinc-700 text-white px-4 py-2 rounded-md my-2"
             {...register("date")}
           />
-          <button className="bg-indigo-500 px-3 py-2 rounded-md ">Save</button>
+
+          {/* Nuevo input para la importancia */}
+          <label htmlFor="importance">Importance</label>
+          <select
+            className="w-full bg-zinc-700 text-white px-4 py-2 rounded-md my-2"
+            {...register("importance")}
+          >
+            <option value="BAJA">Baja</option>
+            <option value="MEDIA">Media</option>
+            <option value="ALTA">Alta</option>
+            <option value="URGENTE">Urgente</option>
+          </select>
+
+          <button className="bg-indigo-500 px-3 py-2 rounded-md">Save</button>
         </form>
       </div>
     </div>

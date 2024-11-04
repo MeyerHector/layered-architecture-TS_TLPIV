@@ -45,7 +45,7 @@ export function TaskProvider({ children }) {
       const res = await deleteTaskRequest(id);
       if (res.status === 204) {
         console.log(`Tarea con ID: ${id} eliminada.`);
-        setTasks((prevTasks) => prevTasks.filter((task) => task._id !== id));
+        setTasks((prevTasks) => prevTasks.filter((task) => task.id !== id));
       }
     } catch (error) {
       console.log(`Error al eliminar tarea con ID: ${id}`, error);
@@ -66,7 +66,7 @@ export function TaskProvider({ children }) {
       const res = await updateTaskRequest(id, task);
       console.log(res);
       setTasks((prevTasks) =>
-        prevTasks.map((t) => (t._id === id ? res.data : t))
+        prevTasks.map((t) => (t.id === id ? res.data : t))
       );
     } catch (error) {
       console.log(error);

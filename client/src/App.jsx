@@ -11,14 +11,17 @@ import HomePage from "./pages/HomePage";
 import ProtectedRoute from "./ProtectedRoute";
 import { TaskProvider } from "./context/TaskContext";
 import Navbar from "./components/Navbar";
+import { useState } from "react";
 
 function App() {
+  const [searchTerm, setSearchTerm] = useState("")
+
   return (
     <AuthProvider>
       <TaskProvider>
         <BrowserRouter>
           <main className="container mx-auto px-10">
-            <Navbar />
+            <Navbar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
             <Routes>
               <Route path="/" element={<HomePage />} />
               <Route path="/login" element={<LoginPage />} />

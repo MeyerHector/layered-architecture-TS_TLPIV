@@ -5,12 +5,14 @@ export class TaskRepository {
     title: string,
     description: string,
     date: Date,
+    importance: string,
     userId: string | undefined
   ) {
     return await Task.create({
       title,
       description,
       date,
+      importance,
       userId,
     });
   }
@@ -28,10 +30,11 @@ export class TaskRepository {
     title: string,
     description: string,
     date: Date,
+    importance: string,
     userId: string | undefined
   ) {
     return await Task.update(
-      { title, description, date, userId },
+      { title, description, date, importance, userId },
       { where: { id: taskId } }
     );
   }

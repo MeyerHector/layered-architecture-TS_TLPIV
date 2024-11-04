@@ -1,7 +1,14 @@
 import { Table, Model, Column, DataType, PrimaryKey, Default, ForeignKey, BelongsTo } from "sequelize-typescript";
 import { v4 as uuidv4 } from "uuid";
 import { User } from "./User.model";
- 
+
+enum Importance {
+    URGENTE = "URGENTE",
+    ALTA = "ALTA",
+    MEDIA = "MEDIA",
+    BAJA = "BAJA"
+}
+
 @Table({
     timestamps: true,
     tableName: 'tasks',
@@ -32,6 +39,13 @@ export class Task extends Model {
         allowNull: false,
     })
     date!: Date;
+    
+    @Column({
+        type: DataType.ENUM(...Object.values(Importance)),
+        allowNull: false,
+        defaultValue: Importance.MEDIA
+    })
+    importance!: Importance;
     
     @ForeignKey(() => User)
     @Column({

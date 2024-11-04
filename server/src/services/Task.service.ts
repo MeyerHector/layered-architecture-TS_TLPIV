@@ -9,12 +9,13 @@ export class TaskService {
   }
 
   public async createTask(taskData: CreateTask) {
-    const { title, description, date, userId } = taskData;
+    const { title, description, date, importance, userId } = taskData;
     try {
       const task = await this.taskRepository.createTask(
         title,
         description,
         date,
+        importance,
         userId
       );
       return task;
@@ -32,13 +33,14 @@ export class TaskService {
   }
 
   public async updateTask(taskId: string, taskData: CreateTask) {
-    const { title, description, date, userId } = taskData;
+    const { title, description, date, importance, userId } = taskData;
     try {
       const task = await this.taskRepository.updateTask(
         taskId,
         title,
         description,
         date,
+        importance,
         userId
       );
       return task;

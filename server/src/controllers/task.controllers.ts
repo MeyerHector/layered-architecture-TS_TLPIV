@@ -13,11 +13,12 @@ export class TaskController {
 
   public async createTask(req: Request, res: Response): Promise<void> {
     try {
-      const { title, date, description } = req.body as CreateTask;
+      const { title, date, description, importance } = req.body as CreateTask;
       const task = await this.taskService.createTask({
         title,
         date,
         description,
+        importance,
         userId: req.user.id,
       });
       res.status(201).json(task);
@@ -50,11 +51,12 @@ export class TaskController {
 
   public async updateTask(req: Request, res: Response): Promise<void> {
     try {
-      const { title, date, description } = req.body as CreateTask;
+      const { title, date, description, importance } = req.body as CreateTask;
       const task = await this.taskService.updateTask(req.params.id, {
         title,
         date,
         description,
+        importance,
         userId: req.user.id,
       });
       if (!task) {

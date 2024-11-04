@@ -1,1 +1,0 @@
-# Arquitectura por Capas
