@@ -52,14 +52,16 @@ export class TaskService {
   }
 
   public async updateTask(taskId: string, taskData: CreateTask) {
-    const { title, description, date, userId } = taskData;
+    const { title, description, date, userId, subTasks } = taskData;
+    console.log("subTasks", subTasks);
     try {
       const task = await this.taskRepository.updateTask(
         taskId,
         title,
         description,
         date,
-        userId
+        userId,
+        subTasks
       );
       return task;
     } catch (error: any) {

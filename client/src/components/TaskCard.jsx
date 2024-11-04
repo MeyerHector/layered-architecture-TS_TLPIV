@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { useTasks } from "../context/TaskContext";
-import { Fragment, useState } from "react";
+import { Fragment, useState, useEffect } from "react";
 import { Modal } from "@mui/material";
 import SubTaskCardCheck from "./SubTaskCardCheck";
 function TaskCard({ task }) {
@@ -14,6 +14,7 @@ function TaskCard({ task }) {
 
   const handleComplete = async (id) => {
     await markTaskAsCompletedOrNot(id);
+    await getTasks();
   };
 
   return (
@@ -69,7 +70,12 @@ function TaskCard({ task }) {
       >
         {moreInfo && (
           <div>
-            <p className="text-gray-300">{task?.description}</p>
+            <p
+              className="text-gray-300 break-all"
+              dangerouslySetInnerHTML={{
+                __html: task.description.replace(/\n/g, "<br />"),
+              }}
+            ></p>
             Fecha límite: {new Date(task?.date).toLocaleDateString()}
             {task?.subTasks?.length > 0 && (
               <>
@@ -77,13 +83,15 @@ function TaskCard({ task }) {
                   <span>Subtareas ({task?.subTasks.length})</span>
                 </div>
                 <div className="flex flex-col gap-2">
-                  {task?.subTasks.map((subTask, i) => (
-                    <SubTaskCardCheck
-                      key={i}
-                      subTask={subTask}
-                      handleComplete={handleComplete}
-                    />
-                  ))}
+                  {task?.subTasks.map((subTask, i) => {
+                    return (
+                      <SubTaskCardCheck
+                        key={i}
+                        subTask={subTask}
+                        handleComplete={handleComplete}
+                      />
+                    );
+                  })}
                 </div>
               </>
             )}

@@ -4,9 +4,10 @@ import { useEffect } from "react";
 
 function ProtectedRoute() {
   const { authState } = useAuth();
+  console.log(authState);
   const navigate = useNavigate();
   useEffect(() => {
-    if (!localStorage.getItem("token")) {
+    if (!authState.token) {
       navigate("/login");
     }
   }, [authState.token]);

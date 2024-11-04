@@ -35,7 +35,12 @@ const SubTaskCardCheck = ({ subTask, handleComplete }) => {
           }`}
         >
           {moreInfoSubTask && (
-            <p className="text-gray-300">{subTask.description}</p>
+            <p
+              className="text-gray-300"
+              dangerouslySetInnerHTML={{
+                __html: subTask.description.replace(/\n/g, "<br />"),
+              }}
+            ></p>
           )}
         </div>
       </div>
