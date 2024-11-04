@@ -2,15 +2,15 @@ version: "3.8"
 
 services:
   db:
-    image: postgres:13
+    image: postgres
     environment:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_NAME}
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - ./postgres_data:/var/lib/postgresql/data
     ports:
-      - "5432:5432"
+      - "5433:5432"
 
   server:
     build:
@@ -23,6 +23,3 @@ services:
     ports:
       - "4000:4000"
     command: ["npm", "run", "dev"]
-
-volumes:
-  postgres_data:
