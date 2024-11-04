@@ -11,7 +11,7 @@ import { useTasks } from '../context/TaskContext'
 
 export default function Component() {
 
-  const {getTasks, tasks} = useTasks();
+  const { getTasks, tasks } = useTasks();
   const [setTasks] = useState();
   const [searchTerm, setSearchTerm] = useState("")
   const [loading, setLoading] = useState(true);
@@ -60,7 +60,7 @@ export default function Component() {
     return new Date(dueDate) < new Date()
   }
 
-  
+
 
   const getBorderStyle = (task) => {
     switch (task.importance) {
@@ -96,12 +96,12 @@ export default function Component() {
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
               </div>
-              <Button size="sm">
-                <Plus className="w-4 h-4 mr-2" />
-                <Link to={"/add-task"} >
+              <Link to={"/add-task"} >
+                <Button size="sm">
+                  <Plus className="w-4 h-4 mr-2" />
                   Nueva Tarea
-                </Link>
-              </Button>
+                </Button>
+              </Link>
             </div>
           </CardHeader>
           <CardContent>
@@ -133,7 +133,7 @@ export default function Component() {
                       <div className="flex items-center gap-2">
                         <div className="flex items-center text-sm text-muted-foreground">
                           <CalendarDays className="w-4 h-4 mr-2" />
-                          {task.date}
+                          {new Date(task.date).toLocaleDateString()}
                         </div>
                         <Button
                           variant="ghost"
@@ -176,7 +176,7 @@ export default function Component() {
                       <div className="flex items-center gap-2">
                         <div className="flex items-center text-sm text-muted-foreground">
                           <CalendarDays className="w-4 h-4 mr-2" />
-                          {task.dueDate}
+                          {new Date(task.date).toLocaleDateString()}
                         </div>
                         <Button
                           variant="ghost"
@@ -219,7 +219,7 @@ export default function Component() {
                       <div className="flex items-center gap-2">
                         <div className="flex items-center text-sm text-muted-foreground">
                           <CalendarDays className="w-4 h-4 mr-2" />
-                          {task.dueDate}
+                          {new Date(task.date).toLocaleDateString()}
                         </div>
                         <Button
                           variant="ghost"
@@ -262,7 +262,7 @@ export default function Component() {
                       <div className="flex items-center gap-2">
                         <div className="flex items-center text-sm text-red-600 dark:text-red-400">
                           <AlertCircle className="w-4 h-4 mr-2" />
-                          {task.dueDate}
+                          {new Date(task.date).toLocaleDateString()}
                         </div>
                         <Button
                           variant="ghost"
@@ -291,7 +291,7 @@ export default function Component() {
           <CardFooter className="flex justify-between text-sm text-muted-foreground">
             <div>{filteredTasks.length} tareas en total</div>
             <div>{filteredTasks.filter(t => t.completed).length} completadas</div>
-            <div>{filteredTasks.filter(t => !t.completed && isOverdue(t.dueDate)).length} vencidas</div>
+            <div>{filteredTasks.filter(t => !t.completed && isOverdue(t.date)).length} vencidas</div>
           </CardFooter>
         </Card>
       </main>
