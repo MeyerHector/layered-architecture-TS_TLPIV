@@ -106,7 +106,7 @@ export class TaskController {
   public async getCompletedTasks(req: Request, res: Response): Promise<void> {
     try {
       const tasks = await this.taskService.getCompletedTasks(req.user.id);
-      res.json(tasks);
+      res.status(200).json(tasks);
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }

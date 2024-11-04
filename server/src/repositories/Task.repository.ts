@@ -41,16 +41,16 @@ export class TaskRepository {
     const tasks = await Task.findAll({
       where: { userId, parentId: null },
       include: [User],
+      order: [["date", "ASC"]],
     });
 
-    const tasksWithSubTasks = await Promise.all(
+    return await Promise.all(
       tasks.map(async (task) => {
         const subTasks = await Task.findAll({ where: { parentId: task.id } });
         task.setDataValue("subTasks", subTasks);
         return task;
       })
     );
-    return tasksWithSubTasks;
   }
 
   public async getTaskById(taskId: string) {
@@ -88,16 +88,32 @@ export class TaskRepository {
   }
 
   public async getCompletedTasks(userId: string) {
-    return await Task.findAll({
-      where: { userId, completed: true },
+    const tasks = await Task.findAll({
+      where: { userId, completed: true, parentId: null },
       include: [User],
+      order: [["date", "ASC"]],
     });
+    return await Promise.all(
+      tasks.map(async (task) => {
+        const subTasks = await Task.findAll({ where: { parentId: task.id } });
+        task.setDataValue("subTasks", subTasks);
+        return task;
+      })
+    );
   }
 
   public async getIncompleteTasks(userId: string) {
-    return await Task.findAll({
-      where: { userId, completed: false },
+    const tasks = await Task.findAll({
+      where: { userId, completed: false, parentId: null },
       include: [User],
+      order: [["date", "ASC"]],
     });
+    return await Promise.all(
+      tasks.map(async (task) => {
+        const subTasks = await Task.findAll({ where: { parentId: task.id } });
+        task.setDataValue("subTasks", subTasks);
+        return task;
+      })
+    );
   }
 }

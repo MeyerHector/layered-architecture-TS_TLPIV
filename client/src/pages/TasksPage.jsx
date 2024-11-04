@@ -3,11 +3,13 @@ import { useTasks } from "../context/TaskContext";
 import TaskCard from "../components/TaskCard";
 import CalendarPage from "./CalendarPage";
 import styles from "../../public/css/scrollbar.module.css";
+import { getAllCompletedTasks, getAllUncompletedTasks } from "../api/tasks";
 function TasksPage() {
   const { getTasks, tasks } = useTasks();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [view, setView] = useState("all");
+  const [filteredTasks, setFilteredTasks] = useState([]);
 
   useEffect(() => {
     const fetchTasks = async () => {
@@ -23,14 +25,21 @@ function TasksPage() {
     fetchTasks();
   }, [getTasks]);
 
-  const filteredTasks = () => {
-    const filtered = tasks.filter((task) => {
-      if (view === "completed") return task.completed;
-      if (view === "uncompleted") return !task.completed;
-      return true;
-    });
-    return filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
-  };
+  useEffect(() => {
+    const filterTasks = async () => {
+      let tasksToFilter = tasks;
+      if (view === "completed") {
+        const res = await getAllCompletedTasks();
+        tasksToFilter = res.data;
+      } else if (view === "uncompleted") {
+        const res = await getAllUncompletedTasks();
+        tasksToFilter = res.data;
+      }
+      setFilteredTasks(tasksToFilter);
+    };
+
+    filterTasks();
+  }, [view, tasks]);
 
   if (loading) return <p>Cargando...</p>;
   if (error) return <p>{error}</p>;
@@ -71,9 +80,9 @@ function TasksPage() {
           </button>
         </nav>
         <div
-          className={`grid grid-cols-1 gap-4 pe-2 overflow-y-scroll h-[calc(100vh-160px)] ${styles.scrollBar}`}
+          className={`flex flex-col gap-4 pe-2 overflow-y-scroll h-[calc(100vh-160px)] ${styles.scrollBar}`}
         >
-          {filteredTasks().map((task) => (
+          {filteredTasks.map((task) => (
             <TaskCard key={task.id} task={task} />
           ))}
         </div>

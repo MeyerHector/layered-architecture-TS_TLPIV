@@ -22,6 +22,8 @@ const SubTaskForm = ({ openModal, setOpenModal, i, subTasks, setSubTasks }) => {
   return (
     <Dialog
       open={openModal}
+      maxWidth="sm"
+      fullWidth
       onClose={() => {
         setSubTasks(subTasks.filter((subTask, index) => index !== i));
         setOpenModal(false);
@@ -32,7 +34,7 @@ const SubTaskForm = ({ openModal, setOpenModal, i, subTasks, setSubTasks }) => {
         className="bg-zinc-800 p-5  text-white"
         onSubmit={handleSubmit(onSubTaskSubmit)}
       >
-        <h2 className="text-2xl font-bold ">Agregar subtarea</h2>
+        <h2 className="text-2xl font-bold mb-2">Agregar subtarea</h2>
         <div className="title">
           <label htmlFor="title">Título</label>
           <input

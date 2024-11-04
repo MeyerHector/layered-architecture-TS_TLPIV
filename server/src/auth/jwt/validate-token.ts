@@ -22,7 +22,9 @@ export const validateToken = async (
 ): Promise<void> => {
   try {
     if (!req.headers.authorization) {
+      console.log("hola aca ");
       res.status(401).json({ message: "No estas autenticado" });
+      return;
     }
 
     let token = req.headers.authorization;
@@ -31,7 +33,11 @@ export const validateToken = async (
     if (!token) throw new Error("Inicie sesión para continuar");
 
     const verifytoken = jwt.verify(token, JWT_SECRET_KEY) as JwtPayload;
-    if (!verifytoken) res.status(401).json({ message: "Token no valido" });
+    if (!verifytoken) {
+      console.log("hola aca 22");
+      res.status(401).json({ message: "Token no valido" });
+      return;
+    }
 
     let user = await new UserService().getUserById(verifytoken.id);
     if (!user) {
@@ -42,6 +48,7 @@ export const validateToken = async (
     req.user = user;
     next();
   } catch (error) {
+    console.log(error, "hola acaaa");
     res.status(401).json({ message: error });
   }
 };
