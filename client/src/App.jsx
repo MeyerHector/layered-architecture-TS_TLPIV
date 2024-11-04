@@ -10,7 +10,7 @@ import HomePage from "./pages/HomePage";
 
 import ProtectedRoute from "./ProtectedRoute";
 import { TaskProvider } from "./context/TaskContext";
-import Navbar from "./components/Navbar";
+// import Navbar from "./components/Navbar";
 
 function App() {
   return (
@@ -18,7 +18,7 @@ function App() {
       <TaskProvider>
         <BrowserRouter>
           <main className="container mx-auto px-10">
-            <Navbar />
+            {/* <Navbar /> */}
             <Routes>
               <Route path="/" element={<HomePage />} />
               <Route path="/login" element={<LoginPage />} />
