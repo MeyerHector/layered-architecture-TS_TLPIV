@@ -17,7 +17,7 @@ export default function HomePage() {
     <div className="flex min-h-screen flex-col">
       <header className="flex h-16 items-center justify-between border-b px-4 lg:px-8">
         <Link to="/" className="text-xl font-bold">
-          Gestor de Tareas
+          Taskify
         </Link>
         <nav className="flex items-center gap-4">
           <button
@@ -45,7 +45,7 @@ export default function HomePage() {
               Gestiona tus tareas con facilidad
             </h1>
             <p className="mx-auto max-w-[700px] text-lg text-muted-foreground">
-              Organizar tus tareas, simplificar tu rutina y mejorar tu productividad con nuestro gestor de tareas intuitivo y potente.
+              Organizar tus tareas, simplificar tu rutina y mejorar tu productividad con Taskify nuestro gestor de tareas intuitivo y potente.
             </p>
             <div className="flex justify-center gap-4">
               <Button size="lg" className="font-medium">
