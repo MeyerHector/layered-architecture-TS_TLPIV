@@ -1,8 +1,7 @@
-import React from 'react'
 import { Link } from 'react-router-dom'
 import { Button } from '../components/ui/button'
 import { Card } from '../components/ui/card'
-import { CalendarDays, CheckCircle, ListTodo, TrendingUp } from 'lucide-react'
+import { CalendarDays, CheckCircle, ListTodo } from 'lucide-react'
 import Img from '../assets/image/img.png'
 
 export default function HomePage() {
