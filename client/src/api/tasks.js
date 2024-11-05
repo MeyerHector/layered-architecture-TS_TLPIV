@@ -35,8 +35,9 @@ export const deleteTaskRequest = (id) =>
     },
   });
 
-export const markTaskAsCompletedOrNotRequest = (id) =>
-  axios.patch(
+export const markTaskAsCompletedOrNotRequest = (id) => {
+
+  return axios.patch(
     `/api/tasks/${id}`,
     {},
     {
@@ -45,6 +46,7 @@ export const markTaskAsCompletedOrNotRequest = (id) =>
       },
     }
   );
+}
 
 export const getAllCompletedTasks = () =>
   axios.get(

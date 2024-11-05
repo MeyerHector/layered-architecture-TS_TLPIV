@@ -40,7 +40,7 @@ export default function TaskFormPage() {
 
   const onSubmit = async (data) => {
     data.subTasks = subTasks;
-
+    console.log(data.date)
     if (data.date < new Date().toISOString().split("T")[0]) {
       noti("La fecha de vencimiento no puede ser menor a la actual", "error");
       return;

@@ -4,7 +4,12 @@ import { Button } from "./ui/button";
 
 function Navbar() {
   const { authState, logout } = useAuth();
-
+  const scrollToFeatures = () => {
+    const featuresSection = document.getElementById('cont-section');
+    if (featuresSection) {
+      featuresSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
   return (
     <header className="border-b">
       <div className="container flex h-16 items-center justify-between px-4">
@@ -13,11 +18,11 @@ function Navbar() {
         </Link>
         {authState.isLogged ? (
           <ul className="flex gap-x-2">
-            <li style={{margin: 5}}>
+            <li style={{ margin: 5 }}>
               <h1 className="text-black">Bienvenido {authState.user.name}!</h1>
             </li>
             <li>
-            <Link
+              <Link
                 to="/calendar"
               >
                 <Button size="sm">
@@ -25,7 +30,7 @@ function Navbar() {
                 </Button>
               </Link>
             </li>
-            <li style={{margin:5}}>
+            <li style={{ margin: 5 }}>
               <Link to="/" onClick={logout}>
                 Cerrar Sesión
               </Link>
@@ -33,16 +38,23 @@ function Navbar() {
           </ul>
         ) : (
           <ul className="flex gap-x-2">
-            <li>
-              <Link to="/login" className="bg-indigo-500 px-4 py-1 rounded-sm">
-                Login
+            <button
+              onClick={scrollToFeatures}
+              className="text-sm text-muted-foreground hover:text-foreground"
+            >
+              Características
+            </button>
+            <li style={{padding:8}}>
+              <Link
+                to="/login"
+                className="text-sm font-medium hover:text-primary"
+              >
+                Iniciar Sesión
               </Link>
             </li>
-            <li>
-              <Link to="/register" className="bg-indigo-500 px-4 py-1 rounded-sm">
-                Register
-              </Link>
-            </li>
+            <Button asChild>
+              <Link to="/register">Registrarse</Link>
+            </Button>
           </ul>
         )}
       </div>
@@ -51,4 +63,3 @@ function Navbar() {
 }
 
 export default Navbar;
-

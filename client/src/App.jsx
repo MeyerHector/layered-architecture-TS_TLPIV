@@ -11,17 +11,18 @@ import CalendarPage from "./pages/CalendarPage";
 import ProtectedRoute from "./ProtectedRoute";
 import { TaskProvider } from "./context/TaskContext";
 import Navbar from "./components/Navbar";
-import { useState } from "react";
+
+
 
 function App() {
-  const [searchTerm, setSearchTerm] = useState("")
 
   return (
     <AuthProvider>
       <TaskProvider>
         <BrowserRouter>
           <main className="container mx-auto px-10">
-            <Navbar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+
+            <Navbar />
             <Routes>
               <Route path="/" element={<HomePage />} />
               <Route path="/login" element={<LoginPage />} />

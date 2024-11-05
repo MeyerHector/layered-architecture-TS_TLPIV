@@ -15,6 +15,7 @@ export class TaskController {
   public async createTask(req: Request, res: Response): Promise<void> {
     try {
       const { title, date, description, importance, subTasks } = req.body as CreateTask;
+      console.log("Formato de la fecha",date)
       const task = await this.taskService.createTask({
         title,
         date,

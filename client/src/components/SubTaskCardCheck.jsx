@@ -19,7 +19,7 @@ export const SubTaskCardCheck = ({ subTask, handleComplete }) => {
                 id={`subtask-${subTask.id}`}
                 checked={subTask.completed}
                 onCheckedChange={() => {
-                  handleComplete(subTask.id);
+                  handleComplete(subTask);
                   subTask.completed = !subTask.completed;
                 }}
               />

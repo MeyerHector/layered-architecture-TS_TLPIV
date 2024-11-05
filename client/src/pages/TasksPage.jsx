@@ -22,10 +22,6 @@ export default function Component() {
   const [moreInfo, setMoreInfo] = useState(null);
   const navigate = useNavigate();
 
-  const handleComplete = async (id) => {
-    await markTaskAsCompletedOrNot(id);
-    await getTasks();
-  };
 
   useEffect(() => {
     const fetchTasks = async () => {
@@ -40,6 +36,12 @@ export default function Component() {
 
     fetchTasks();
   }, [getTasks]);
+
+  const handleComplete = async (task) => {
+    console.log("task", task)
+    await markTaskAsCompletedOrNot(task.id);
+    await getTasks();
+  };
 
   useEffect(() => {
     const filterTasks = async () => {
@@ -142,7 +144,7 @@ export default function Component() {
                         <div className="flex items-center gap-3">
                           <Checkbox
                             checked={task.completed}
-                            onCheckedChange={() => markTaskAsCompletedOrNot(task.id)}
+                            onCheckedChange={() => handleComplete(task)}
                           />
                           <span className={task.completed ? "line-through text-muted-foreground" : undefined}>
                             {task.title}
@@ -151,7 +153,7 @@ export default function Component() {
                         <div className="flex items-center gap-2">
                           <div className="flex items-center text-sm text-muted-foreground">
                             <CalendarDays className="w-4 h-4 mr-2" />
-                            {new Date(task.date).toLocaleDateString()}
+                            {new Date(task.date).toISOString().split("T")[0]}
                           </div>
                           <Button
                             variant="ghost"
@@ -184,7 +186,12 @@ export default function Component() {
                       >
                         {moreInfo === task.id && (
                           <div>
-                            
+                            <p
+                              className="text-gray-500 break-all"
+                              dangerouslySetInnerHTML={{
+                                __html: task.description.replace(/\n/g, "<br />"),
+                              }}
+                            ></p>
                             {task?.subTasks?.length > 0 && (
                               <>
                                 <div>
@@ -232,7 +239,7 @@ export default function Component() {
                         <div className="flex items-center gap-2">
                           <div className="flex items-center text-sm text-muted-foreground">
                             <CalendarDays className="w-4 h-4 mr-2" />
-                            {new Date(task.date).toLocaleDateString()}
+                            {new Date(task.date).toISOString().split("T")[0]}
                           </div>
                           <Button
                             variant="ghost"
@@ -318,7 +325,7 @@ export default function Component() {
                         <div className="flex items-center gap-2">
                           <div className="flex items-center text-sm text-muted-foreground">
                             <CalendarDays className="w-4 h-4 mr-2" />
-                            {new Date(task.date).toLocaleDateString()}
+                            {new Date(task.date).toISOString().split("T")[0]}
                           </div>
                           <Button
                             variant="ghost"
@@ -404,7 +411,7 @@ export default function Component() {
                         <div className="flex items-center gap-2">
                           <div className="flex items-center text-sm text-red-600 dark:text-red-400">
                             <AlertCircle className="w-4 h-4 mr-2" />
-                            {new Date(task.date).toLocaleDateString()}
+                            {new Date(task.date).toISOString().split("T")[0]}
                           </div>
                           <Button
                             variant="ghost"

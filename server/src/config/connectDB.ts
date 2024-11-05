@@ -12,7 +12,7 @@ export const connectDB = async () => {
       console.error("error connecting the database ✖️", error);
     });
   await db
-    .sync({ force: false })
+    .sync({ force: true })
     .then(async () => {
       console.log("synchronized tables successfully 🚀");
       const users = await usersService.getAllUsers();
