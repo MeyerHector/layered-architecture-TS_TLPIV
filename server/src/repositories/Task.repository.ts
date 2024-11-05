@@ -75,7 +75,7 @@ export class TaskRepository {
     date: Date,
     importance: string,
     userId: string | undefined,
-    subTasksData: [SubTask] | undefined
+    subTasksData: [SubTask] | undefined,
   ) {
     try {
       const task = await Task.findByPk(taskId);
@@ -195,7 +195,12 @@ export class TaskRepository {
 
   public async getIncompleteTasks(userId: string) {
     const tasks = await Task.findAll({
-      where: { userId, completed: false, parentId: null },
+      where: {
+        userId,
+        completed: false,
+        parentId: null,
+        date: { [sequelize.Op.gte]: new Date() },
+      },
       include: [User],
       order: [["date", "ASC"]],
     });

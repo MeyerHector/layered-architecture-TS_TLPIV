@@ -12,14 +12,13 @@ import {
 import { v4 as uuidv4 } from "uuid";
 import { User } from "./User.model";
 
-
 enum Importance {
     URGENTE = "URGENTE",
     ALTA = "ALTA",
     MEDIA = "MEDIA",
     BAJA = "BAJA"
-}
 
+}
 @Table({
   timestamps: true,
   tableName: "tasks",

@@ -15,7 +15,6 @@ export class TaskController {
   public async createTask(req: Request, res: Response): Promise<void> {
     try {
       const { title, date, description, importance, subTasks } = req.body as CreateTask;
-
       const task = await this.taskService.createTask({
         title,
         date,
@@ -36,6 +35,7 @@ export class TaskController {
       const tasks = await this.taskService.getTasksByUser(req.user.id);
       res.json(tasks);
     } catch (error: any) {
+      console.log(error);
       res.status(500).json({ message: error.message });
     }
   }
