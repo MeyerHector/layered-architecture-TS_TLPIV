@@ -57,13 +57,14 @@ export class TaskController {
 
   public async updateTask(req: Request, res: Response): Promise<void> {
     try {
-      const { title, date, description, importance } = req.body as CreateTask;
+      const { title, date, description, importance, subTasks } = req.body as CreateTask;
       const task = await this.taskService.updateTask(req.params.id, {
         title,
         date,
         description,
         importance,
         userId: req.user.id,
+        subTasks,
       });
       if (!task) {
         res.status(404).json({ message: "Task not found" });

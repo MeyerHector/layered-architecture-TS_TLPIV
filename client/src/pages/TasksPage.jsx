@@ -6,16 +6,26 @@ import { ScrollArea } from "../components/ui/scroll-area"
 import { Input } from "../components/ui/input"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs"
 import { AlertCircle, CalendarDays, Edit, Plus, Search, Trash2 } from "lucide-react"
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useTasks } from '../context/TaskContext'
+import { getAllCompletedTasks, getAllUncompletedTasks } from "../api/tasks";
+import SubTaskCardCheck from '../components/SubTaskCardCheck'
 
 export default function Component() {
 
-  const { getTasks, tasks } = useTasks();
-  const [setTasks] = useState();
+  const { getTasks, tasks, markTaskAsCompletedOrNot, deleteTask } = useTasks();
   const [searchTerm, setSearchTerm] = useState("")
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [view, setView] = useState("all");
+  const [filteredTasks, setFilteredTasks] = useState([]);
+  const [moreInfo, setMoreInfo] = useState(null);
+  const navigate = useNavigate();
+
+  const handleComplete = async (id) => {
+    await markTaskAsCompletedOrNot(id);
+    await getTasks();
+  };
 
   useEffect(() => {
     const fetchTasks = async () => {
@@ -31,36 +41,44 @@ export default function Component() {
     fetchTasks();
   }, [getTasks]);
 
-  const filteredTasks = tasks.filter(task =>
-    task.title.toLowerCase().includes(searchTerm.toLowerCase())
+  useEffect(() => {
+    const filterTasks = async () => {
+      let tasksToFilter = tasks;
+      if (view === "completed") {
+        const res = await getAllCompletedTasks();
+        tasksToFilter = res.data;
+      } else if (view === "uncompleted") {
+        const res = await getAllUncompletedTasks();
+        tasksToFilter = res.data;
+      } else if (view === "overdue") {
+        tasksToFilter = tasks.filter((task) => {
+          if (!task.completed) {
+            return new Date(task.date) < new Date();
+          }
+          return false;
+        });
+      }
+      setFilteredTasks(tasksToFilter);
+    };
+
+    filterTasks();
+  }, [view, tasks]);
+
+  const filterTasksrender = filteredTasks.filter(task =>
+    task.title && task.title.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
   if (loading) return <p>Cargando...</p>;
   if (error) return <p>{error}</p>;
 
-
-
-  const toggleTask = (taskId) => {
-    setTasks(tasks.map(task =>
-      task.id === taskId ? { ...task, importance: !task.importance } : task
-    ))
-  }
-
-  const editTask = (taskId, newTitle) => {
-    setTasks(tasks.map(task =>
-      task.id === taskId ? { ...task, title: newTitle } : task
-    ))
-  }
-
-  const deleteTask = (taskId) => {
-    setTasks(tasks.filter(task => task.id !== taskId))
-  }
+  const handleDelete = async (id) => {
+    await deleteTask(id);
+    await getTasks();
+  };
 
   const isOverdue = (dueDate) => {
     return new Date(dueDate) < new Date()
   }
-
-
 
   const getBorderStyle = (task) => {
     switch (task.importance) {
@@ -107,50 +125,86 @@ export default function Component() {
           <CardContent>
             <Tabs defaultValue="all" className="w-full">
               <TabsList className="mb-4">
-                <TabsTrigger value="all">Todas</TabsTrigger>
-                <TabsTrigger value="pending">Pendientes</TabsTrigger>
-                <TabsTrigger value="completed">Completadas</TabsTrigger>
-                <TabsTrigger value="overdue">Vencidas</TabsTrigger>
+                <TabsTrigger value="all" onClick={() => setView("all")}>Todas</TabsTrigger>
+                <TabsTrigger value="pending" onClick={() => setView("uncompleted")}>Pendientes</TabsTrigger>
+                <TabsTrigger value="completed" onClick={() => setView("completed")}>Completadas</TabsTrigger>
+                <TabsTrigger value="overdue" onClick={() => setView("overdue")}>Vencidas</TabsTrigger>
               </TabsList>
               <TabsContent value="all">
                 <ScrollArea className="h-[400px] pr-4">
-                  {filteredTasks.map((task) => (
+                  {filterTasksrender.map((task) => (
                     <div
                       key={task.id}
-                      className="flex items-center justify-between p-4 mb-2 border rounded-lg hover:bg-accent"
+                      className="flex flex-col p-4 mb-2 border rounded-lg hover:bg-accent"
                       style={getBorderStyle(task)}
                     >
-                      <div className="flex items-center gap-3">
-                        <Checkbox
-                          checked={task.completed}
-                          onCheckedChange={() => toggleTask(task.id)}
-                        />
-                        <span className={task.completed ? "line-through text-muted-foreground" : ""}>
-                          {task.title}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div className="flex items-center text-sm text-muted-foreground">
-                          <CalendarDays className="w-4 h-4 mr-2" />
-                          {new Date(task.date).toLocaleDateString()}
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <Checkbox
+                            checked={task.completed}
+                            onCheckedChange={() => markTaskAsCompletedOrNot(task.id)}
+                          />
+                          <span className={task.completed ? "line-through text-muted-foreground" : undefined}>
+                            {task.title}
+                          </span>
                         </div>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => {
-                            const newTitle = prompt("Editar tarea", task.title)
-                            if (newTitle) editTask(task.id, newTitle)
-                          }}
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => deleteTask(task.id)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
+                        <div className="flex items-center gap-2">
+                          <div className="flex items-center text-sm text-muted-foreground">
+                            <CalendarDays className="w-4 h-4 mr-2" />
+                            {new Date(task.date).toLocaleDateString()}
+                          </div>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => {
+                              navigate(`/tasks/${task.id}`)
+                            }}
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleDelete(task.id)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                          <button onClick={() => setMoreInfo(moreInfo === task.id ? null : task.id)}>
+                            {moreInfo === task.id ? (
+                              <i className="fa-solid fa-angle-up "></i>
+                            ) : (
+                              <i className="fa-solid fa-angle-down "></i>
+                            )}
+                          </button>
+                        </div>
+                      </div>
+                      <div
+                        className={`transition-max-height duration-1000 ease-in-out overflow-hidden ${moreInfo === task.id ? "max-h-96" : "max-h-0"
+                          }`}
+                      >
+                        {moreInfo === task.id && (
+                          <div>
+                            
+                            {task?.subTasks?.length > 0 && (
+                              <>
+                                <div>
+                                  <span>Subtareas ({task?.subTasks.length})</span>
+                                </div>
+                                <div className="flex flex-col gap-2">
+                                  {task?.subTasks.map((subTask, i) => {
+                                    return (
+                                      <SubTaskCardCheck
+                                        key={i}
+                                        subTask={subTask}
+                                        handleComplete={handleComplete}
+                                      />
+                                    );
+                                  })}
+                                </div>
+                              </>
+                            )}
+                          </div>
+                        )}
                       </div>
                     </div>
                   ))}
@@ -159,41 +213,84 @@ export default function Component() {
 
               <TabsContent value="pending">
                 <ScrollArea className="h-[400px] pr-4">
-                  {filteredTasks.filter(t => !t.completed).map((task) => (
+                  {filterTasksrender.filter(t => !t.completed).map((task) => (
                     <div
                       key={task.id}
-                      className="flex items-center justify-between p-4 mb-2 border rounded-lg hover:bg-accent"
+                      className="flex flex-col p-4 mb-2 border rounded-lg hover:bg-accent"
                       style={getBorderStyle(task)}
                     >
-                      <div className="flex items-center gap-3">
-                        <Checkbox
-                          checked={task.completed}
-                          onCheckedChange={() => toggleTask(task.id)}
-                        />
-                        <span>{task.title}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div className="flex items-center text-sm text-muted-foreground">
-                          <CalendarDays className="w-4 h-4 mr-2" />
-                          {new Date(task.date).toLocaleDateString()}
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <Checkbox
+                            checked={task.completed}
+                            onCheckedChange={() => markTaskAsCompletedOrNot(task.id)}
+                          />
+                          <span className={task.completed ? "line-through text-muted-foreground" : undefined}>
+                            {task.title}
+                          </span>
                         </div>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => {
-                            const newTitle = prompt("Editar tarea", task.title)
-                            if (newTitle) editTask(task.id, newTitle)
-                          }}
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => deleteTask(task.id)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
+                        <div className="flex items-center gap-2">
+                          <div className="flex items-center text-sm text-muted-foreground">
+                            <CalendarDays className="w-4 h-4 mr-2" />
+                            {new Date(task.date).toLocaleDateString()}
+                          </div>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => {
+                              navigate(`/tasks/${task.id}`)
+                            }}
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleDelete(task.id)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                          <button onClick={() => setMoreInfo(moreInfo === task.id ? null : task.id)}>
+                            {moreInfo === task.id ? (
+                              <i className="fa-solid fa-angle-up "></i>
+                            ) : (
+                              <i className="fa-solid fa-angle-down "></i>
+                            )}
+                          </button>
+                        </div>
+                      </div>
+                      <div
+                        className={`transition-max-height duration-1000 ease-in-out overflow-hidden ${moreInfo === task.id ? "max-h-96" : "max-h-0"
+                          }`}
+                      >
+                        {moreInfo === task.id && (
+                          <div>
+                            <p
+                              className="text-gray-300 break-all"
+                              dangerouslySetInnerHTML={{
+                                __html: task.description.replace(/\n/g, "<br />"),
+                              }}
+                            ></p>
+                            {task?.subTasks?.length > 0 && (
+                              <>
+                                <div>
+                                  <span>Subtareas ({task?.subTasks.length})</span>
+                                </div>
+                                <div className="flex flex-col gap-2">
+                                  {task?.subTasks.map((subTask, i) => {
+                                    return (
+                                      <SubTaskCardCheck
+                                        key={i}
+                                        subTask={subTask}
+                                        handleComplete={handleComplete}
+                                      />
+                                    );
+                                  })}
+                                </div>
+                              </>
+                            )}
+                          </div>
+                        )}
                       </div>
                     </div>
                   ))}
@@ -202,41 +299,84 @@ export default function Component() {
 
               <TabsContent value="completed">
                 <ScrollArea className="h-[400px] pr-4">
-                  {filteredTasks.filter(t => t.completed).map((task) => (
+                  {filterTasksrender.filter(t => t.completed).map((task) => (
                     <div
                       key={task.id}
-                      className="flex items-center justify-between p-4 mb-2 border rounded-lg hover:bg-accent"
+                      className="flex flex-col p-4 mb-2 border rounded-lg hover:bg-accent"
                       style={getBorderStyle(task)}
                     >
-                      <div className="flex items-center gap-3">
-                        <Checkbox
-                          checked={task.completed}
-                          onCheckedChange={() => toggleTask(task.id)}
-                        />
-                        <span className="line-through text-muted-foreground">{task.title}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div className="flex items-center text-sm text-muted-foreground">
-                          <CalendarDays className="w-4 h-4 mr-2" />
-                          {new Date(task.date).toLocaleDateString()}
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <Checkbox
+                            checked={task.completed}
+                            onCheckedChange={() => markTaskAsCompletedOrNot(task.id)}
+                          />
+                          <span className={task.completed ? "line-through text-muted-foreground" : undefined}>
+                            {task.title}
+                          </span>
                         </div>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => {
-                            const newTitle = prompt("Editar tarea", task.title)
-                            if (newTitle) editTask(task.id, newTitle)
-                          }}
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => deleteTask(task.id)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
+                        <div className="flex items-center gap-2">
+                          <div className="flex items-center text-sm text-muted-foreground">
+                            <CalendarDays className="w-4 h-4 mr-2" />
+                            {new Date(task.date).toLocaleDateString()}
+                          </div>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => {
+                              navigate(`/tasks/${task.id}`)
+                            }}
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleDelete(task.id)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                          <button onClick={() => setMoreInfo(moreInfo === task.id ? null : task.id)}>
+                            {moreInfo === task.id ? (
+                              <i className="fa-solid fa-angle-up "></i>
+                            ) : (
+                              <i className="fa-solid fa-angle-down "></i>
+                            )}
+                          </button>
+                        </div>
+                      </div>
+                      <div
+                        className={`transition-max-height duration-1000 ease-in-out overflow-hidden ${moreInfo === task.id ? "max-h-96" : "max-h-0"
+                          }`}
+                      >
+                        {moreInfo === task.id && (
+                          <div>
+                            <p
+                              className="text-gray-300 break-all"
+                              dangerouslySetInnerHTML={{
+                                __html: task.description.replace(/\n/g, "<br />"),
+                              }}
+                            ></p>
+                            {task?.subTasks?.length > 0 && (
+                              <>
+                                <div>
+                                  <span>Subtareas ({task?.subTasks.length})</span>
+                                </div>
+                                <div className="flex flex-col gap-2">
+                                  {task?.subTasks.map((subTask, i) => {
+                                    return (
+                                      <SubTaskCardCheck
+                                        key={i}
+                                        subTask={subTask}
+                                        handleComplete={handleComplete}
+                                      />
+                                    );
+                                  })}
+                                </div>
+                              </>
+                            )}
+                          </div>
+                        )}
                       </div>
                     </div>
                   ))}
@@ -245,41 +385,84 @@ export default function Component() {
 
               <TabsContent value="overdue">
                 <ScrollArea className="h-[400px] pr-4">
-                  {filteredTasks.filter(t => !t.completed && isOverdue(t.dueDate)).map((task) => (
+                  {filterTasksrender.filter(t => !t.completed && isOverdue(t.date)).map((task) => (
                     <div
                       key={task.id}
-                      className="flex items-center justify-between p-4 mb-2 border border-red-200 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/10"
+                      className="flex flex-col p-4 mb-2 border border-red-200 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/10"
                       style={getBorderStyle(task)}
                     >
-                      <div className="flex items-center gap-3">
-                        <Checkbox
-                          checked={task.completed}
-                          onCheckedChange={() => toggleTask(task.id)}
-                        />
-                        <span className="text-red-600 dark:text-red-400">{task.title}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div className="flex items-center text-sm text-red-600 dark:text-red-400">
-                          <AlertCircle className="w-4 h-4 mr-2" />
-                          {new Date(task.date).toLocaleDateString()}
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <Checkbox
+                            checked={task.completed}
+                            onCheckedChange={() => markTaskAsCompletedOrNot(task.id)}
+                          />
+                          <span className={task.completed ? "line-through text-muted-foreground" : undefined}>
+                            {task.title}
+                          </span>
                         </div>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => {
-                            const newTitle = prompt("Editar tarea", task.title)
-                            if (newTitle) editTask(task.id, newTitle)
-                          }}
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => deleteTask(task.id)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
+                        <div className="flex items-center gap-2">
+                          <div className="flex items-center text-sm text-red-600 dark:text-red-400">
+                            <AlertCircle className="w-4 h-4 mr-2" />
+                            {new Date(task.date).toLocaleDateString()}
+                          </div>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => {
+                              navigate(`/tasks/${task.id}`)
+                            }}
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleDelete(task.id)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                          <button onClick={() => setMoreInfo(moreInfo === task.id ? null : task.id)}>
+                            {moreInfo === task.id ? (
+                              <i className="fa-solid fa-angle-up "></i>
+                            ) : (
+                              <i className="fa-solid fa-angle-down "></i>
+                            )}
+                          </button>
+                        </div>
+                      </div>
+                      <div
+                        className={`transition-max-height duration-1000 ease-in-out overflow-hidden ${moreInfo === task.id ? "max-h-96" : "max-h-0"
+                          }`}
+                      >
+                        {moreInfo === task.id && (
+                          <div>
+                            <p
+                              className="text-gray-300 break-all"
+                              dangerouslySetInnerHTML={{
+                                __html: task.description.replace(/\n/g, "<br />"),
+                              }}
+                            ></p>
+                            {task?.subTasks?.length > 0 && (
+                              <>
+                                <div>
+                                  <span>Subtareas ({task?.subTasks.length})</span>
+                                </div>
+                                <div className="flex flex-col gap-2">
+                                  {task?.subTasks.map((subTask, i) => {
+                                    return (
+                                      <SubTaskCardCheck
+                                        key={i}
+                                        subTask={subTask}
+                                        handleComplete={handleComplete}
+                                      />
+                                    );
+                                  })}
+                                </div>
+                              </>
+                            )}
+                          </div>
+                        )}
                       </div>
                     </div>
                   ))}
@@ -288,9 +471,9 @@ export default function Component() {
             </Tabs>
           </CardContent>
           <CardFooter className="flex justify-between text-sm text-muted-foreground">
-            <div>{filteredTasks.length} tareas en total</div>
-            <div>{filteredTasks.filter(t => t.completed).length} completadas</div>
-            <div>{filteredTasks.filter(t => !t.completed && isOverdue(t.date)).length} vencidas</div>
+            <div>{filterTasksrender.length} tareas en total</div>
+            <div>{filterTasksrender.filter(t => t.completed).length} completadas</div>
+            <div>{filterTasksrender.filter(t => !t.completed && isOverdue(t.date)).length} vencidas</div>
           </CardFooter>
         </Card>
       </main>

@@ -7,6 +7,8 @@ export interface CreateTask {
   subTasks?: [SubTask];
 }
 export interface SubTask {
+  userId?: string;
+  id?: string;
   title: string;
   description: string;
 }

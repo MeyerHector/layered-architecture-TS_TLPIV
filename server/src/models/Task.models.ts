@@ -47,15 +47,21 @@ export class Task extends Model {
     description!: string;
     
     @Column({
+      type: DataType.BOOLEAN,
+      defaultValue: false,
+      allowNull: false,
+    })
+    completed!: boolean;
+
+    @Column({
         type: DataType.DATE,
-        allowNull: false,
+        allowNull: true,
     })
     date!: Date;
     
     @Column({
         type: DataType.ENUM(...Object.values(Importance)),
-        allowNull: false,
-        defaultValue: Importance.MEDIA
+        allowNull: true,
     })
     importance!: Importance;
     
@@ -83,5 +89,4 @@ export class Task extends Model {
 
   @BelongsTo(() => User)
   user!: User;
-  completed: any;
 }

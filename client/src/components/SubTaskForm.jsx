@@ -1,6 +1,13 @@
-import { Dialog } from "@mui/material";
+'use client'
+
 import React from "react";
-import { set, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../components/ui/dialog";
+import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
+import { Textarea } from "../components/ui/textarea";
+import { Label } from "../components/ui/label";
+
 
 const SubTaskForm = ({ openModal, setOpenModal, i, subTasks, setSubTasks }) => {
   const {
@@ -18,70 +25,58 @@ const SubTaskForm = ({ openModal, setOpenModal, i, subTasks, setSubTasks }) => {
       submit: true,
     };
     setSubTasks(updatedSubTasks);
+    setOpenModal(false);
   };
-  return (
-    <Dialog
-      open={openModal}
-      maxWidth="sm"
-      fullWidth
-      onClose={() => {
-        setSubTasks(subTasks.filter((subTask, index) => index !== i));
-        setOpenModal(false);
-        reset();
-      }}
-    >
-      <form
-        className="bg-zinc-800 p-5  text-white"
-        onSubmit={handleSubmit(onSubTaskSubmit)}
-      >
-        <h2 className="text-2xl font-bold mb-2">Agregar subtarea</h2>
-        <div className="title">
-          <label htmlFor="title">Título</label>
-          <input
-            type="text"
-            placeholder="Title"
-            className="w-full bg-zinc-700 text-white px-4 py-2 rounded-md my-2"
-            {...register(`title`, {
-              required: "Este campo es requerido",
-            })}
-          />
-          {errors.title && (
-            <p className="text-red-500 text-xs italic">
-              {errors.title.message}
-            </p>
-          )}
-        </div>
-        <div className="description">
-          <label htmlFor="description">Descripción</label>
-          <textarea
-            rows="3"
-            placeholder="Description"
-            className="w-full bg-zinc-700 text-white px-4 py-2 rounded-md my-2"
-            {...register(`description`, {
-              required: "Este campo es requerido",
-            })}
-          ></textarea>
-          {errors.description && (
-            <p className="text-red-500 text-xs italic">
-              {errors.description.message}
-            </p>
-          )}
-        </div>
 
-        <div className="flex justify-end mt-2">
-          <button
-            onClick={() => {
-              setSubTasks(subTasks.filter((subTask, index) => index !== i));
-            }}
-            className="bg-red-500 px-3 py-1 rounded-md mr-2"
-          >
-            Borrar
-          </button>
-          <button type="submit" className="bg-indigo-500 px-3 py-1 rounded-md ">
-            {subTasks[i].title !== "" ? "Editar" : "Agregar"}
-          </button>
-        </div>
-      </form>
+  const handleClose = () => {
+    setSubTasks(subTasks.filter((_, index) => index !== i));
+    setOpenModal(false);
+    reset();
+  };
+
+  return (
+    <Dialog open={openModal} onOpenChange={setOpenModal}>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>{subTasks[i].title !== "" ? "Editar subtarea" : "Agregar subtarea"}</DialogTitle>
+        </DialogHeader>
+        <form onSubmit={handleSubmit(onSubTaskSubmit)} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="title">Título</Label>
+            <Input
+              id="title"
+              placeholder="Título de la subtarea"
+              {...register("title", {
+                required: "Este campo es requerido",
+              })}
+            />
+            {errors.title && (
+              <p className="text-sm text-red-500">{errors.title.message}</p>
+            )}
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="description">Descripción</Label>
+            <Textarea
+              id="description"
+              placeholder="Descripción de la subtarea"
+              {...register("description", {
+                required: "Este campo es requerido",
+              })}
+            />
+            {errors.description && (
+              <p className="text-sm text-red-500">{errors.description.message}</p>
+            )}
+          </div>
+          <div className="flex justify-end space-x-2">
+            <Button type="button" variant="destructive" onClick={handleClose}>
+              Borrar
+            </Button>
+            <Button type="submit">
+              {subTasks[i].title !== "" ? "Editar" : "Agregar"}
+            </Button>
+          </div>
+        </form>
+      </DialogContent>
     </Dialog>
   );
 };

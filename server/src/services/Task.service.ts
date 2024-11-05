@@ -39,6 +39,7 @@ export class TaskService {
       return task;
     } catch (error: any) {
       await t.rollback();
+      console.log("eoeoeoeor", error)
       throw new Error(error.message);
     }
   }
@@ -54,7 +55,8 @@ export class TaskService {
   }
 
   public async updateTask(taskId: string, taskData: CreateTask) {
-    const { title, description, date, importance, userId } = taskData;
+    const { title, description, date, importance, userId, subTasks } = taskData;
+    console.log("subTasks", subTasks);
     try {
       const task = await this.taskRepository.updateTask(
         taskId,
@@ -62,7 +64,8 @@ export class TaskService {
         description,
         date,
         importance,
-        userId
+        userId,
+        subTasks
       );
       return task;
     } catch (error: any) {

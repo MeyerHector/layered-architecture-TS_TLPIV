@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { Button } from "./ui/button";
 
 function Navbar() {
   const { authState, logout } = useAuth();
@@ -12,26 +13,19 @@ function Navbar() {
         </Link>
         {authState.isLogged ? (
           <ul className="flex gap-x-2">
-            <li>
+            <li style={{margin: 5}}>
               <h1 className="text-black">Bienvenido {authState.user.name}!</h1>
             </li>
             <li>
-              <Link
-                to="/add-task"
-                className="bg-indigo-500 px-4 py-1 rounded-sm"
+            <Link
+                to="/calendar"
               >
-                Agrega una Tarea
+                <Button size="sm">
+                  Ver Calendario
+                </Button>
               </Link>
             </li>
-            <li>
-              <Link
-                to="/calendar" 
-                className="bg-indigo-500 px-4 py-1 rounded-sm"
-              >
-                Ver Calendario
-              </Link>
-            </li>
-            <li>
+            <li style={{margin:5}}>
               <Link to="/" onClick={logout}>
                 Cerrar Sesión
               </Link>

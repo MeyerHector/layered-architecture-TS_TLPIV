@@ -1,11 +1,18 @@
 import React from "react";
 import { useNoti } from "../hooks/useNoti";
+import { Card, CardContent } from "../components/ui/card";
+import { Button } from "../components/ui/button";
+import { X, PenSquare } from "lucide-react";
+
+
 
 const SubTaskCard = ({ subTask, subTasks, setSubTasks, i, setOpenModal }) => {
   const noti = useNoti();
+
   const onDelete = () => {
-    setSubTasks(subTasks.filter((subTask, index) => index !== i));
+    setSubTasks(subTasks.filter((_, index) => index !== i));
   };
+
   const onEdit = () => {
     if (subTasks.some((subTask) => !subTask.submit)) {
       noti(`Completa la subtarea actual antes de editar otra`, "info");
@@ -19,20 +26,23 @@ const SubTaskCard = ({ subTask, subTasks, setSubTasks, i, setOpenModal }) => {
     setOpenModal(true);
     setSubTasks(updatedSubTasks);
   };
+
   return (
-    <div className="bg-zinc-700 w-full px-3 py-2.5 rounded">
-      <div className="flex justify-between">
-        <span className=" break-all">{subTask.title}</span>
-        <div className="flex gap-4">
-          <button type="button" onClick={onDelete}>
-            <i className="fas fa-times"></i>
-          </button>
-          <button type="button" onClick={onEdit}>
-            <i className="fa-regular fa-pen-to-square"></i>
-          </button>
+    <Card className="w-full">
+      <CardContent className="p-4">
+        <div className="flex items-center justify-between">
+          <span className="text-sm font-medium break-all mr-2">{subTask.title}</span>
+          <div className="flex gap-2">
+            <Button variant="ghost" size="icon" onClick={onDelete} aria-label="Delete subtask">
+              <X className="h-4 w-4" />
+            </Button>
+            <Button variant="ghost" size="icon" onClick={onEdit} aria-label="Edit subtask">
+              <PenSquare className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 };
 
