@@ -1,4 +1,3 @@
-import sequelize from "sequelize";
 import { CreateTask } from "../interfaces";
 import { TaskRepository } from "../repositories/Task.repository";
 import { Sequelize } from "sequelize-typescript";
@@ -12,7 +11,7 @@ export class TaskService {
   }
 
   public async createTask(taskData: CreateTask) {
-    const { title, description, date, userId, subTasks } = taskData;
+    const { title, description, date, userId, subTasks, importance } = taskData;
     const t = await this.sequelize.transaction();
     try {
       const task = await this.taskRepository.createTask(
@@ -20,6 +19,7 @@ export class TaskService {
         description,
         date,
         userId,
+        importance,
         t
       );
       if (subTasks) {
@@ -52,7 +52,7 @@ export class TaskService {
   }
 
   public async updateTask(taskId: string, taskData: CreateTask) {
-    const { title, description, date, userId, subTasks } = taskData;
+    const { title, description, date, userId, subTasks, importance } = taskData;
     console.log("subTasks", subTasks);
     try {
       const task = await this.taskRepository.updateTask(
@@ -61,7 +61,8 @@ export class TaskService {
         description,
         date,
         userId,
-        subTasks
+        subTasks,
+        importance
       );
       return task;
     } catch (error: any) {

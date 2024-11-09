@@ -4,6 +4,7 @@ export interface CreateTask {
   date: Date;
   userId?: string;
   subTasks?: [SubTask];
+  importance: string;
 }
 export interface SubTask {
   userId?: string;

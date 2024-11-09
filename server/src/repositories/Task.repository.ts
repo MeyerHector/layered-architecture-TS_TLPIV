@@ -8,6 +8,7 @@ export class TaskRepository {
     description: string,
     date: Date,
     userId: string | undefined,
+    importance: string,
     t: sequelize.Transaction
   ) {
     return await Task.create(
@@ -16,6 +17,7 @@ export class TaskRepository {
         description,
         date,
         userId,
+        importance,
       },
       { transaction: t }
     );
@@ -75,13 +77,14 @@ export class TaskRepository {
     description: string,
     date: Date,
     userId: string | undefined,
-    subTasksData: [SubTask] | undefined
+    subTasksData: [SubTask] | undefined,
+    importance: string
   ) {
     try {
       const task = await Task.findByPk(taskId);
       if (task) {
         const updatedTask = await Task.update(
-          { title, description, date, userId },
+          { title, description, date, userId, importance },
           { where: { id: taskId } }
         );
         if (subTasksData) {
@@ -195,7 +198,12 @@ export class TaskRepository {
 
   public async getIncompleteTasks(userId: string) {
     const tasks = await Task.findAll({
-      where: { userId, completed: false, parentId: null },
+      where: {
+        userId,
+        completed: false,
+        parentId: null,
+        date: { [sequelize.Op.gte]: new Date() },
+      },
       include: [User],
       order: [["date", "ASC"]],
     });

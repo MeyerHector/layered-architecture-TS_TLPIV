@@ -12,6 +12,13 @@ import {
 import { v4 as uuidv4 } from "uuid";
 import { User } from "./User.model";
 
+enum Importance {
+  URGENTE = "URGENTE",
+  ALTA = "ALTA",
+  MEDIA = "MEDIA",
+  BAJA = "BAJA",
+}
+
 @Table({
   timestamps: true,
   tableName: "tasks",
@@ -49,6 +56,12 @@ export class Task extends Model {
     allowNull: true,
   })
   date!: Date;
+
+  @Column({
+    type: DataType.ENUM(...Object.values(Importance)),
+    allowNull: true,
+  })
+  importance!: Importance;
 
   @ForeignKey(() => User)
   @Column({
