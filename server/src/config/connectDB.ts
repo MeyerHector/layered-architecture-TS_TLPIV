@@ -5,7 +5,7 @@ export const connectDB = async () => {
     await db.authenticate();
     console.log("Database connection successful 🚀");
 
-    await db.sync({ force: true });
+    await db.sync({ force: false });
     console.log("Synchronized tables successfully 🚀");
   } catch (error) {
     console.error(
